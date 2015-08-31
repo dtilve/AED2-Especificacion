@@ -1,0 +1,87 @@
+TAD Agentes es Diccionario(nat,tupla(pos,nat,nat)) 	
+
+TAD AS’s
+	Generos
+		altaSeguridad
+	Igualdad observacional
+	Usa
+		nat, bool 
+	Exporta
+
+	Observadores basicos
+		rastrillaje: altaSeguridad a -> rastrillaje r
+		obtenerAgentes:	altaSeguridad a -> d_agentes
+		posicionDeAgente: altaSeguridad a x nat n -> pos p
+		posicionEstudiantes: altaSeguridad a -> conj(pos) c
+		posicionHippies: altaSeguridad a -> conj(pos) c
+		capturasDeAgente: altaSeguridad a x nat id -> nat kills
+		sancionesDeAgente: altaSeguridad a x nat id -> nat sanciones
+		
+
+	Generadores
+		iniciar: rastrillaje r x conj(pos) conjPosAgentes -> altaSeguridad	{#conjAgentes = #agentes(r) ^l conjAgentes \subseteq libres(r)}
+		ingresarEstudiante: altaSeguridad a x pos p -> altaSeguridad	{p \in disponibles(a) ^ p 1era o ultima fila}
+		ingresarHippie: altaSeguridad a x pos p -> altaSeguridad	{p \in disponibles(a) ^ p 1era o ultima fila}
+		moverEstudiante: altaSeguridad a x pos pi x pos pf-> altaSeguridad a2     {pf \in movimientosPosibles(a,pi)}
+	
+	Otras operaciones
+		posicionAgentes: altaSeguridad a -> conj(pos)
+		disponibles: altaSeguridad a -> conj(pos)
+		#hippies: altaSeguridad a -> nat n
+		#estudiante: altaSeguridad a -> nat n
+		masVigilante: altaSeguridad a -> nat id 
+	Axiomas
+		rastrillaje(iniciar(r,ca))		= r
+		rastrillaje(ingresarEstudiante(a,p))	= rastrillaje(a)
+		rastrillaje(ingresarHippie(a,p))	= rastrillaje(a)
+		rastrillaje(moverEstudiante(a,pi,pf))	= rastrillaje(a)
+		
+		obtenerAgentes(iniciar(r,ca))		= if (not vacio(ca)) then
+								definir( dameUno(agentes(r)) , (dameUno(ca),0,0) , obtenerAgentes(iniciar( (rastrillar(ancho(r),alto(r),obstaculos(r),sinUno(agentes(r)),sinUno(ca)),sinUno(ca))
+
+		posicionDeAgentes(iniciar(r,ca), id)	= pi_1(obtener(id,obtenerAgente(inciar(r,ca)))
+		posicionDeAgente(ingresarEstudiante(a,p),id) = pi_1(obtener(id,d_agentes))
+		posicionDeAgente(ingresarHippie(a,p),id) = pi_1(obtener(id,d_agentes))
+		posicionDeAgente(moverEstudiante(a,pi,pf), id) = 
+
+FIn TAD
+
+TAD Rastrillaje
+	Generos
+		rastrillaje
+	Igualdad observacional
+	Usa
+		nat, Bool 
+	Exporta
+	Generadores
+		rastrillar: nat ancho x nat altura x conj(pos) conjObs x con(nat) idAgentes -> rastrillaje	{ancho>0 ^ alto >0 ^ (/forall x:pos) x \in conjObs => 1<= pi_1x <= ancho ^ 1<= pi_2x <= alto}
+
+	Observadores basicos
+		agentes: rastrillaje -> conj(nat) idAgentes
+		obstaculos: rastrillaje -> conj(pos) conjObs
+		alto : rastrillaje -> nat
+		ancho : rastrillaje -> nat
+
+	Otras operaciones
+		libres: rastrillaje -> conj(pos)
+		generarPosiciones : rastrillaje r x nat i x nat j -> conj(pos) { 0 <= i <= ancho(r), 0 <= j <= alto(r) }
+		distanciaRectilinea : rastrillaje r x pos p1 x pos p2 -> nat n
+	Axiomas
+	forall r:rastrillaje 
+		agente(rastrillar(a,h,co,ids)) 		= conj (id)
+		ostaculos(rastrillar(a,h,co,ids))	= co
+		alto (rastrillar(a,h,co,ids))		= h
+		ancho (rastrillar (a, h, co, ids)) 	= a
+		libres(r)				= generarPosiciones(r,ancho(r),alto(r)) - obstaculos(r)  	
+		generarPosiciones(r, i, j) 		= if(i>0)then
+								if (j>0) then
+									Ag((i,j),generarPosiciones(r,i, j-1))
+								else Ag((i,j),generarPosiciones(r,i-1,j))
+							else {}
+		distanciaRectilinea(r,p,q)= 
+FIn TAD
+
+
+
+
+

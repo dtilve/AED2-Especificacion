@@ -22,7 +22,7 @@ TAD AS’s
 		ingresarHippie: altaSeguridad a x pos p -> altaSeguridad	{p \in disponibles(a) ^ posIngreso(a,p)}
 		moverEstudiante: altaSeguridad a x pos pi x pos pf-> altaSeguridad a2     {pi \in posicionEstudiantes(a) ^ pf \in movimientosPosibles(a,pi)}
 		moverHippie: altaSeguridad a x pos pi -> altaseguridad a2	{pi \in posicionHippies(a) ^ not vacio?(movimientosPosibles(a,pi))}
-		moverAS: altaseguridad a x pos pi -> altaseguridad a2		{pi \in posicionAgentes(a) ^ not vacio?(movimientosPosibles(a,pi))}
+		moverAS: altaseguridad a x nat id -> altaseguridad a2		{id \in claves(obtenerAgentes(a)) ^ not vacio?(movimientosPosibles(a,posicionDeAgente(a,id)))}
 	
 	
 	Otras operaciones
@@ -47,11 +47,11 @@ TAD AS’s
 		
 		
 		obtenerAgentes(iniciar(r,d))		= d
-		obtenerAgentes(ingresarEstudiante(a,p))= obtenerAgentes(a)
-		obtenerAgentes(ingresarHippie(a,p))= obtenerAgentes(a)
+		obtenerAgentes(ingresarEstudiante(a,p)) = obtenerAgentes(a)
+		obtenerAgentes(ingresarHippie(a,p)) 	= obtenerAgentes(a)
 		obtenerAgentes(moverEstudiante(a,pi,pf))= obtenerAgentes(a)
-		obtenerAgentes(moverHippie(a,pi))= obtenerAgentes(a)
-		obtenerAgentes(moverAS(a,pi))= 
+		obtenerAgentes(moverHippie(a,pi)) 	= obtenerAgentes(a)
+		obtenerAgentes(moverAS(a,id)) 		= definir(id, significadoMov(a,id) , obtenerAgentes(a))
 		
 		
 		
@@ -89,6 +89,7 @@ TAD Rastrillaje
 		generarPosiciones : rastrillaje r x nat i x nat j -> conj(pos) { 0 <= i <= ancho(r), 0 <= j <= alto(r) }
 		distanciaRectilinea : rastrillaje r x pos p1 x pos p2 -> nat n
 		distancia: nat a x nat b -> nat c
+		menorDistancia: rastrillaje r x pos p x conj(pos) conQ -> pos q		{¬vacio?(conQ) ^ p \in generarPosiciones(r,ancho(r),alto(r)) ^ (\forall q: pos) (q \in conQ => q \in generarPosiciones(r,ancho(r),alto(r)))}
 	Axiomas (forall r:rastrillaje) (forall i,j,a,h: nat) (forall p,q: pos) (forall co:conj(pos) 
 		ostaculos(rastrillar(a,h,co))	= co
 		alto (rastrillar(a,h,co))	= h
@@ -103,4 +104,8 @@ TAD Rastrillaje
 								{}
 		distanciaRectilinea(r,p,q)= distancia(distancia(pi_1(p),pi_1(q)),distancia(pi_1(p),pi_1(q)))
 		distancia(i,j) = if i >= j then i-j else j-i fi
+		menorDistancia(r,p,conQ))= if #conQ > 1 then 
+						menor(distanciaRectilinea(r,p,dameUno(conQ)),menorDistancia(r,p,sinUno(conQ)))
+						else
+						dameUno(conQ)
 FIn TAD

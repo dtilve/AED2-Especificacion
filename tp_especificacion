@@ -55,11 +55,11 @@ TAD AS’s
 		obtenerAgentes(moverAS(a,id)) 		= definir(id, funcion que dejamo' para depue' , obtenerAgentes(a))
 		
 		posicionEstudiantes(iniciar(r,d))		= {}
-		pocisionEstudiantes(ingresarEstudiante(a,p))	= Comportamiento automático (lo dejamo' para depue' :v)
-		pocisionEstudiantes(ingresarHippie(a,p))	= Comportamiento automático (lo dejamo' para depue' :v)
-		pocisionEstudiantes(moverEstudiante(a,pi,pf))	= Comportamiento automático (lo dejamo' para depue' :v)
-		pocisionEstudiantes(moverHippie(a,pi))		= Comportamiento automático (lo dejamo' para depue' :v)
-		pocisionEstudiantes(moverAS(a,pi))		= posicionEstudiantes(a)
+		posicionEstudiantes(ingresarEstudiante(a,p))	= Comportamiento automático (lo dejamo' para depue' :v) // hay que verificar si hay hippies (2) alrededor => ingresar hippie => automatico etc :P
+		posicionEstudiantes(ingresarHippie(a,p))	= Comportamiento automático (lo dejamo' para depue' :v)
+		posicionEstudiantes(moverEstudiante(a,pi,pf))	= Comportamiento automático (lo dejamo' para depue' :v)
+		posicionEstudiantes(moverHippie(a,pi))		= Comportamiento automático (lo dejamo' para depue' :v)
+		posicionEstudiantes(moverAS(a,pi))		= posicionEstudiantes(a)
 		
 		
 		posicionHippies(iniciar(r,d))			= {}
@@ -83,7 +83,12 @@ TAD AS’s
 		(moverHippie(a,pi))
 		(moverAS(a,pi))
 		
-		posIngreso(a,p)	= (( 1<= pi_1(p) <= ancho(rastrillaje(a)) ^ 1==pi_2(p) ) v ( 1<= pi_1(p) <= ancho(rastrillaje(a)) ^ alto(rastrillaje(a))==pi_2(p) ))
+		disponibles(a)				= libres(rastrillaje(a)) - posicionEstudiantes(a) - posicionHippies(a) - posicionAgentes(a)
+		movimientosPosibles (a,p)		= {(pi_1(p)+1,pi_2(p)), (pi_1(p)-1,pi_2(p)), (pi_1(p),pi_2(p)+1), (pi_1(p),pi_2(p)-1)}	\intersección disponibles(a)
+		posIngreso(a,p)				= pi_2(p) == 1 v pi_2(p)== alto(rastrillaje(a))
+		#estudiantes(a)				= #posicionEstudiantes(a)
+		#hippies(a)				= #posicionHippies(a)
+		
 FIn TAD
 
 TAD Rastrillaje
@@ -107,8 +112,9 @@ TAD Rastrillaje
 		distanciaRectilinea : rastrillaje r x pos p1 x pos p2 -> nat n
 		distancia: nat a x nat b -> nat c
 		menorDistancia: rastrillaje r x pos p x conj(pos) conQ -> pos q		{¬vacio?(conQ) ^ p \in generarPosiciones(r,ancho(r),alto(r)) ^ (\forall q: pos) (q \in conQ => q \in generarPosiciones(r,ancho(r),alto(r)))}
+	
 	Axiomas (forall r:rastrillaje) (forall i,j,a,h: nat) (forall p,q: pos) (forall co:conj(pos) 
-		ostaculos(rastrillar(a,h,co))	= co
+		obstaculos(rastrillar(a,h,co))	= co
 		alto (rastrillar(a,h,co))	= h
 		ancho (rastrillar (a, h, co)) 	= a
 		libres(r)				= generarPosiciones(r,ancho(r),alto(r)) - obstaculos(r)  	
@@ -125,4 +131,4 @@ TAD Rastrillaje
 						menor(distanciaRectilinea(r,p,dameUno(conQ)),menorDistancia(r,p,sinUno(conQ)))
 						else
 						dameUno(conQ)
-FIn TAD
+Fin TAD

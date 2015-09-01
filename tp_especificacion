@@ -26,16 +26,17 @@ TAD AS’s
 	
 	
 	Otras operaciones
+
 		posicionAgentes: altaSeguridad a -> conj(pos)
-		disponibles: altaSeguridad a -> conj(pos)
-		#hippies: altaSeguridad a -> nat n
-		#estudiante: altaSeguridad a -> nat n
-		masVigilante: altaSeguridad a -> nat id 
-		posIngreso : altaSeguridad a x pos p -> bool
+		posicionDeAgente: altaSeguridad a x nat n -> pos p
 		capturasDeAgente: altaSeguridad a x nat id -> nat kills
 		sancionesDeAgente: altaSeguridad a x nat id -> nat sanciones
-		posicionDeAgente: altaSeguridad a x nat n -> pos p
+		masVigilante: altaSeguridad a -> nat id
+		disponibles: altaSeguridad a -> conj(pos)
 		movimientosPosibles: altaSeguridad a x pos p -> conj(pos)
+		posIngreso : altaSeguridad a x pos p -> bool
+		#estudiantes: altaSeguridad a -> nat n
+		#hippies: altaSeguridad a -> nat n
 
 	Axiomas
 		rastrillaje(iniciar(r,d))		= r
@@ -51,14 +52,30 @@ TAD AS’s
 		obtenerAgentes(ingresarHippie(a,p)) 	= obtenerAgentes(a)
 		obtenerAgentes(moverEstudiante(a,pi,pf))= obtenerAgentes(a)
 		obtenerAgentes(moverHippie(a,pi)) 	= obtenerAgentes(a)
-		obtenerAgentes(moverAS(a,id)) 		= definir(id, significadoMov(a,id) , obtenerAgentes(a))
+		obtenerAgentes(moverAS(a,id)) 		= definir(id, funcion que dejamo' para depue' , obtenerAgentes(a))
+		
+		posicionEstudiantes(iniciar(r,d))		= {}
+		pocisionEstudiantes(ingresarEstudiante(a,p))	= Comportamiento automático (lo dejamo' para depue' :v)
+		pocisionEstudiantes(ingresarHippie(a,p))	= Comportamiento automático (lo dejamo' para depue' :v)
+		pocisionEstudiantes(moverEstudiante(a,pi,pf))	= Comportamiento automático (lo dejamo' para depue' :v)
+		pocisionEstudiantes(moverHippie(a,pi))		= Comportamiento automático (lo dejamo' para depue' :v)
+		pocisionEstudiantes(moverAS(a,pi))		= posicionEstudiantes(a)
+		
+		
+		posicionHippies(iniciar(r,d))			= {}
+		posicionHippies(ingresarEstudiante(a,p))	= posicionHippies(a)
+		posicionHippies(ingresarHippie(a,p))		= Comportamiento automático (lo dejamo' para depue' :v)
+		posicionHippies(moverEstudiante(a,pi,pf))	= Comportamiento automático (lo dejamo' para depue' :v)
+		posicionHippies(moverHippie(a,pi))		= Comportamiento automático (lo dejamo' para depue' :v)
+		posicionHippies(moverAS(a,pi))			= Comportamiento automático (lo dejamo' para depue' :v)
 		
 		
 		
-		posicionDeAgentes(iniciar(r,ca), id)	= pi_1(obtener(id,obtenerAgente(inciar(r,ca)))
-		posicionDeAgente(ingresarEstudiante(a,p),id) = pi_1(obtener(id,d_agentes))
-		posicionDeAgente(ingresarHippie(a,p),id) = pi_1(obtener(id,d_agentes))
-		posicionDeAgente(moverEstudiante(a,pi,pf), id) = 
+		
+		posicionDeAgentes(iniciar(r,ca),id)		= pi_1(obtener(id,obtenerAgente(inciar(r,ca)))
+		posicionDeAgente(ingresarEstudiante(a,p),id) 	= pi_1(obtener(id,d_agentes))
+		posicionDeAgente(ingresarHippie(a,p),id) 	= pi_1(obtener(id,d_agentes))
+		posicionDeAgente(moverEstudiante(a,pi,pf), id) 	= 
 		
 		(ingresarEstudiante(a,p))
 		(ingresarHippie(a,p))

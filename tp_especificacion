@@ -52,14 +52,14 @@ TAD AS’s
 		obtenerAgentes(ingresarHippie(a,p)) 	= obtenerAgentes(a)
 		obtenerAgentes(moverEstudiante(a,pi,pf))= obtenerAgentes(a)
 		obtenerAgentes(moverHippie(a,pi)) 	= obtenerAgentes(a)
-		obtenerAgentes(moverAS(a,id)) 		= definir(id, funcion que dejamo' para depue' , obtenerAgentes(a))
+		obtenerAgentes(moverAS(a,id)) 		= definir(id,  )
 		
 		posicionEstudiantes(iniciar(r,d))		= {}  //creo que no hace falta
 		posicionEstudiantes(ingresarEstudiante(a,p))	= if rodeadoDeHippies(p) then posicionEstudiantes(a) else Ag(p,posicionEstudiantes(a)) fi    //contar(H,a,p) >= 2
 		posicionEstudiantes(ingresarHippie(a,p))	= if rodeadoDeEstudiantes(p) then Ag(p,posicionEstudiantes(a)) else posicionEstudiantes(a) fi
 		posicionEstudiantes(moverEstudiante(a,pi,pf))	= if rodeadoDeHippies(pf) then posicionEstudiantes(a) else posicionEstudiantes(desplazarEstudiante(a,pi,pf)) fi
 		posicionEstudiantes(moverHippie(a,pi))		= if rodeadoDeEstudiantes(p) then Ag(pi,posicionEstudiantes(a)) else posicionEstudiantes(a) fi
-		posicionEstudiantes(moverAS(a,pi))		= posicionEstudiantes(a)
+		posicionEstudiantes(moverAS(a,id))		= posicionEstudiantes(a)
 		
 		
 		posicionHippies(iniciar(r,d))			= {} //creo q no hace falta
@@ -67,15 +67,15 @@ TAD AS’s
 		posicionHippies(ingresarHippie(a,p))		= if rodeadoDeEstudiantes(p) then posicionHippies(a) else Ag(p,posicionHippies(a)) fi
 		posicionHippies(moverEstudiante(a,pi,pf))	= if rodeadoDeHippies(pf) then Ag(p,posicionHippies(a)) else posicionHippies(a) fi 
 		posicionHippies(moverHippie(a,pi))		= Ag(moverHaciaEstudianteMasCercano(pi),(posicionHippie(a) - {pi}))
-		posicionHippies(moverAS(a,pi))			= if hippieAmenazado?(pi) then posicionHippies(a)-{hippieMasCercano(pi)} else posicionHippies(a) fi
+		posicionHippies(moverAS(a,id))			= posicionesDeHippies(a) - hippiesAEliminar(a,moverAlHippieMasCercano(a,id),posicionesAdyacentes(moverAlHippieMasCercano(a,id))) \interseccion posicionesDeHippies(a))
 		
+		hippiesAEliminar(a,p,cp) = if vacio?(movimientosPosibles(a,dameUno(cp)) - {p}) then
+						Ag(dameUno(cp),hippiesAEliminar(a,p,sinUno(cp)))
+					else
+						hippiesAEliminar(a,p,sinUno(cp))
+					fi
 		
-		
-		
-		posicionDeAgentes(iniciar(r,ca),id)		= pi_1(obtener(id,obtenerAgente(inciar(r,ca)))
-		posicionDeAgente(ingresarEstudiante(a,p),id) 	= pi_1(obtener(id,d_agentes))
-		posicionDeAgente(ingresarHippie(a,p),id) 	= pi_1(obtener(id,d_agentes))
-		posicionDeAgente(moverEstudiante(a,pi,pf), id) 	= 
+		moverAlHippieMasCercano(a,id) = menorDistancia(rastrillaje(a),menorDistancia(rastrillaje(a),posicionDeAgente(a,id),posicionHippies(a)),movimientosPosibles(a,posicionDeAgente(a,id))))
 		
 		
 		posIngreso(a,p)		= (( 1<= pi_1(p) <= ancho(rastrillaje(a)) ^ 1==pi_2(p) ) v ( 1<= pi_1(p) <= ancho(rastrillaje(a)) ^ alto(rastrillaje(a))==pi_2(p) ))
@@ -119,6 +119,10 @@ TAD AS’s
 		posIngreso(a,p)				= pi_2(p) == 1 v pi_2(p)== alto(rastrillaje(a))
 		#estudiantes(a)				= #posicionEstudiantes(a)
 		#hippies(a)				= #posicionHippies(a)
+		
+		funcion_que_dejamo_pa_depue(algo) = 
+		
+		
 		
 FIn TAD
 

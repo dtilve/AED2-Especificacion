@@ -55,19 +55,19 @@ TAD AS’s
 		obtenerAgentes(moverAS(a,id)) 		= definir(id, funcion que dejamo' para depue' , obtenerAgentes(a))
 		
 		posicionEstudiantes(iniciar(r,d))		= {}
-		posicionEstudiantes(ingresarEstudiante(a,p))	= Comportamiento automático (lo dejamo' para depue' :v) // hay que verificar si hay hippies (2) alrededor => ingresar hippie => automatico etc :P
-		posicionEstudiantes(ingresarHippie(a,p))	= Comportamiento automático (lo dejamo' para depue' :v)
-		posicionEstudiantes(moverEstudiante(a,pi,pf))	= Comportamiento automático (lo dejamo' para depue' :v)
-		posicionEstudiantes(moverHippie(a,pi))		= Comportamiento automático (lo dejamo' para depue' :v)
+		posicionEstudiantes(ingresarEstudiante(a,p))	= if rodeadoDeHippies(p) then ingresarHippie(a,p) else Ag(p,posicionEstudiantes(a)) /////contar(H,a,p) >= 2
+		posicionEstudiantes(ingresarHippie(a,p))	= if rodeadoDeEstudiantes(p) then ingresarEstudiante(a,p) else posicionEstudiantes(a)
+		posicionEstudiantes(moverEstudiante(a,pi,pf))	= if rodeadoDeHippies(pf) then transformarEnHippie(a,pi,pf) else desplazarEstudiante(a,pi,pf)
+		posicionEstudiantes(moverHippie(a,pi))		= if rodeadoDeEstudiantes(p) then transformarEnEstudiante(a,pi) else posicionEstudiantes(a)                           
 		posicionEstudiantes(moverAS(a,pi))		= posicionEstudiantes(a)
 		
 		
 		posicionHippies(iniciar(r,d))			= {}
-		posicionHippies(ingresarEstudiante(a,p))	= posicionHippies(a)
-		posicionHippies(ingresarHippie(a,p))		= Comportamiento automático (lo dejamo' para depue' :v)
-		posicionHippies(moverEstudiante(a,pi,pf))	= Comportamiento automático (lo dejamo' para depue' :v)
-		posicionHippies(moverHippie(a,pi))		= Comportamiento automático (lo dejamo' para depue' :v)
-		posicionHippies(moverAS(a,pi))			= Comportamiento automático (lo dejamo' para depue' :v)
+		posicionHippies(ingresarEstudiante(a,p))	= if rodeadoDeHippies(p) then ingresarHippie(a,p) else posicionHippies(a)
+		posicionHippies(ingresarHippie(a,p))		= if rodeadoDeEstudiantes(p) then ingresarEstudiante(a,p) else Ag(p,posicionEstudiantes(a))
+		posicionHippies(moverEstudiante(a,pi,pf))	= 
+		posicionHippies(moverHippie(a,pi))		= 
+		posicionHippies(moverAS(a,pi))			= 
 		
 		
 		

@@ -20,7 +20,7 @@ TAD AS’s
 		iniciar: rastrillaje r x d_agentes d -> altaSeguridad	{#conjAgentes = #agentes(r) ^l conjPosAgentes \subseteq libres(r)}
 		ingresarEstudiante: altaSeguridad a x pos p -> altaSeguridad	{p \in disponibles(a) ^ posIngreso(a,p)}
 		ingresarHippie: altaSeguridad a x pos p -> altaSeguridad	{p \in disponibles(a) ^ posIngreso(a,p)}
-		moverEstudiante: altaSeguridad a x pos pi x pos pf-> altaSeguridad a2     {pi \in posicionEstudiantes(a) ^ pf \in movimientosPosibles(a,pi)}
+		moverEstudiante: altaSeguridad a x pos pi x pos pf-> altaSeguridad a2     {pi \in posicionEstudiantes(a) ^ (pf \in movimientosPosibles(a,pi) v puedeSalir(a,pi,pf))}
 		moverHippie: altaSeguridad a x pos pi -> altaseguridad a2	{pi \in posicionHippies(a) ^ not vacio?(movimientosPosibles(a,pi))}
 		moverAS: altaseguridad a x nat id -> altaseguridad a2		{id \in claves(obtenerAgentes(a)) ^ not vacio?(movimientosPosibles(a,posicionDeAgente(a,id))) ^ sancionesDeAgente(a,id) <= 3}
 	
@@ -37,6 +37,7 @@ TAD AS’s
 		posIngreso : altaSeguridad a x pos p -> bool
 		#estudiantes: altaSeguridad a -> nat n
 		#hippies: altaSeguridad a -> nat n
+		extender: altaSeduridad a -> altaSeguridad a
 
 	Axiomas
 		rastrillaje(iniciar(r,d))		= r
@@ -57,17 +58,17 @@ TAD AS’s
 		posicionEstudiantes(iniciar(r,d))		= {}  //creo que no hace falta
 		posicionEstudiantes(ingresarEstudiante(a,p))	= if rodeadoDeHippies(p) then posicionEstudiantes(a) else Ag(p,posicionEstudiantes(a)) fi    //contar(H,a,p) >= 2
 		posicionEstudiantes(ingresarHippie(a,p))	= if rodeadoDeEstudiantes(p) then Ag(p,posicionEstudiantes(a)) else posicionEstudiantes(a) fi
-		posicionEstudiantes(moverEstudiante(a,pi,pf))	= if rodeadoDeHippies(pf) then posicionEstudiantes(a) else posicionEstudiantes(desplazarEstudiante(a,pi,pf)) fi
-		posicionEstudiantes(moverHippie(a,pi))		= posicionEstudiantes(a) - estudiantesAdyAmenazados(a,moverAMasCercano(pi,posicionEstudiantes(a)))
+		posicionEstudiantes(moverEstudiante(a,pi,pf))	= if rodeadoDeHippies(pf) v puedeSalir(a,pi,pf) then posicionEstudiantes(a) else Ag(pf,posicionEstudiantes(a)-{pi}) fi
+		posicionEstudiantes(moverHippie(a,pi))		= posicionEstudiantes(a) - estudiantesAdyAmenazados(a,asechar(a,pi,posicionEstudiantes(a)))
 		posicionEstudiantes(moverAS(a,id))		= posicionEstudiantes(a)
 		
 		
 		posicionHippies(iniciar(r,d))			= {} //creo q no hace falta
 		posicionHippies(ingresarEstudiante(a,p))	= if rodeadoDeHippies(a,p) then Ag(p,posicionHippies(a)) else posicionHippies(a) fi
 		posicionHippies(ingresarHippie(a,p))		= if rodeadoDeEstudiantes(a,p) v rodeadoDeAS(a,p) then posicionHippies(a) else Ag(p,posicionHippies(a)) fi
-		posicionHippies(moverEstudiante(a,pi,pf))	= if rodeadoDeHippies(pf) then Ag(p,posicionHippies(a)) else posicionHippies(a) fi 
-		posicionHippies(moverHippie(a,pi))		= Ag(moverHaciaEstudianteMasCercano(pi),(posicionHippie(a) - {pi}))
-		posicionHippies(moverAS(a,id))			= posicionesDeHippies(a) - hippiesAEliminar(a,moverAlHippieMasCercano(a,id),posicionesAdyacentes(moverAlHippieMasCercano(a,id))) \interseccion posicionesDeHippies(a))
+		posicionHippies(moverEstudiante(a,pi,pf))	= if rodeadoDeHippies(pf) then Ag(pf,posicionHippies(a)) else posicionHippies(a) fi 
+		posicionHippies(moverHippie(a,pi))		= Ag(asechar(a,pi,posicionEstudiantes(a)),(posicionHippies(a) - {pi}))
+		posicionHippies(moverAS(a,id))			= posicionesDeHippies(a) - hippiesAEliminar(a,sechar(a,posicionDeAgente(a,id),posicionHippies(a)),posicionesAdyacentes(asechar(a,posicionDeAgente(a,id),posicionHippies(a)))) \interseccion posicionesDeHippies(a))
 		
 		hippiesAEliminar(a,p,cp) = if vacio?(movimientosPosibles(a,dameUno(cp)) - {p}) then
 						Ag(dameUno(cp),hippiesAEliminar(a,p,sinUno(cp)))
@@ -75,10 +76,10 @@ TAD AS’s
 						hippiesAEliminar(a,p,sinUno(cp))
 					fi
 		
-		moverAlHippieMasCercano(a,id) = if vacio?(posicionHippies(a)) then moverASalidaMasCercana(a,id) 
-						else menorDistancia(rastrillaje(a),menorDistancia(rastrillaje(a),posicionDeAgente(a,id),posicionHippies(a)),movimientosPosibles(a,posicionDeAgente(a,id))))
+		asechar(a,p,cp) = if vacio?(cp) then masCercano(a,p,salidas(rastrillaje(a))-disponibles(a))
+						else masCercano(a,p,cp) fi
 		
-		MoverASalidaMasCercana(a,id) = menorDistancia(rastrillaje(a),menorDistancia(rastrillaje(a),posicionDeAgente(a,id),salidas(rastrillaje(a))),movimientosPosibles(a,posicionDeAgente(a,id))))
+		masCercano(a,p,cp) = menorDistancia(rastrillaje(a),menorDistancia(rastrillaje(a),p,cp),movimientosPosibles(a,p)))
 		
 		
 		posIngreso(a,p)		= (( 1<= pi_1(p) <= ancho(rastrillaje(a)) ^ 1==pi_2(p) ) v ( 1<= pi_1(p) <= ancho(rastrillaje(a)) ^ alto(rastrillaje(a))==pi_2(p) ))
@@ -125,7 +126,7 @@ TAD AS’s
 		
 		funcion_que_dejamo_pa_depue(algo) = 
 		
-		
+		puedeSalir(a,pi,pf) = posIngreso(a,pi) ^ (pi_2(pf) == 0 v pi_2(pf) == alto(rastrillaje(a))+1)
 		
 FIn TAD
 
@@ -150,7 +151,7 @@ TAD Rastrillaje
 		salidas: rastrillaje r x nat i -> conj(pos) {1 <= i <= ancho(r)}
 		distanciaRectilinea : rastrillaje r x pos p1 x pos p2 -> nat n
 		distancia: nat a x nat b -> nat c
-		menorDistancia: rastrillaje r x pos p x conj(pos) conQ -> pos q		{¬vacio?(conQ) ^ p \in generarPosiciones(r,ancho(r),alto(r)) ^ (\forall q: pos) (q \in conQ => q \in generarPosiciones(r,ancho(r),alto(r)))}
+		menorDistancia: rastrillaje r x pos p x conj(pos) conQ -> pos q		{p \in generarPosiciones(r,ancho(r),alto(r)) ^ (\forall q: pos) (q \in conQ => q \in generarPosiciones(r,ancho(r),alto(r)))}
 	
 	Axiomas (forall r:rastrillaje) (forall i,j,a,h: nat) (forall p,q: pos) (forall co:conj(pos) 
 		obstaculos(rastrillar(a,h,co))	= co
@@ -167,8 +168,11 @@ TAD Rastrillaje
 		salidas(r,i) = if i == 1 then Ag((1,1),Ag((1,alto(r)),vacio)) else Ag((i,1),Ag((i,alto(r)),salidas(r,i-1)))
 		distanciaRectilinea(r,p,q)= distancia(distancia(pi_1(p),pi_1(q)),distancia(pi_1(p),pi_1(q)))
 		distancia(i,j) = if i >= j then i-j else j-i fi
-		menorDistancia(r,p,conQ))= if #conQ > 1 then 
+		menorDistancia(r,p,conQ)) =    if vacio?(conQ) then p else
+					        (if #conQ > 1 then 
 						menor(distanciaRectilinea(r,p,dameUno(conQ)),menorDistancia(r,p,sinUno(conQ)))
 						else
 						dameUno(conQ)
+						fi)
+						fi
 Fin TAD

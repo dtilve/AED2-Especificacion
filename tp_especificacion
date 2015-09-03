@@ -77,12 +77,43 @@ TAD AS’s
 		posicionDeAgente(ingresarHippie(a,p),id) 	= pi_1(obtener(id,d_agentes))
 		posicionDeAgente(moverEstudiante(a,pi,pf), id) 	= 
 		
-		(ingresarEstudiante(a,p))
-		(ingresarHippie(a,p))
-		(moverEstudiante(a,pi,pf))
-		(moverHippie(a,pi))
-		(moverAS(a,pi))
 		
+		posIngreso(a,p)		= (( 1<= pi_1(p) <= ancho(rastrillaje(a)) ^ 1==pi_2(p) ) v ( 1<= pi_1(p) <= ancho(rastrillaje(a)) ^ alto(rastrillaje(a))==pi_2(p) ))
+		posicionAgentes(a,n) 	= 	if (n==0) then ///tomo que los agentes se empiezan a contar desde 1 por ser nat
+							{}
+						else 
+							posicionDeAgente(a,n) u posicionAgentes(a,n-1)
+						fi
+		posicionDeAgente(a,id) 	= pi_1(obtener(n,obtenerAgentes(a)))
+		capturasDeAgente(a,id) 	= pi_2(obtener(n,obtenerAgentes(a)))				//-> nat kills
+		sancionesDeAgente(a,id) = pi_3(obtener(n,obtenerAgentes(a)))				//-> nat sanciones
+		masVigilante(a) 	=	pi_1(tieneMasCapturas(conjCapturas(a,1)))		//-> nat id
+		conjCapturas(a,n)	=	if (¬ def?(n)) then
+							{}
+						else
+							(n,capturasDeAgente(a,n)) u conjCapturas(a,n+1)
+						fi
+		tieneMasCapturas(c) = 	if (#c==2) then
+						if pi_2(dameUno(c)) >= pi_2(dameUno(sinUno(c))) then
+							if pi_2(dameUno(c)) == pi_2(dameUno(sinUno(c))) then
+								if pi_1(dameUno(c)) < pi_1(dameUno(sinUno(c))) then dameUno(c) else dameUno(sinUno(c)) fi
+							else
+								dameUno(c)
+							fi
+						else
+							dameUno(sinUno(c))
+						fi
+					else
+						if pi_2(dameUno(c)) >= pi_2(dameUno(sinUno(c))) then
+							if pi_2(dameUno(c)) == pi_2(dameUno(sinUno(c))) then
+								if pi_1(dameUno(c)) < pi_1(dameUno(sinUno(c))) then tieneMasSanciones(dameUno(c) u sinUno(sonUno(c))) else tieneMasSanciones(dameUno(sinUno(c)) u sinUno(sinUno(c))) fi
+							else
+								tieneMasSanciones(dameUno(c) u sinUno(sonUno(c)))
+							fi
+						else
+							tieneMasSanciones(dameUno(sinUno(c)) u sinUno(sinUno(c)))
+						fi
+					fi
 		disponibles(a)				= libres(rastrillaje(a)) - posicionEstudiantes(a) - posicionHippies(a) - posicionAgentes(a)
 		movimientosPosibles (a,p)		= {(pi_1(p)+1,pi_2(p)), (pi_1(p)-1,pi_2(p)), (pi_1(p),pi_2(p)+1), (pi_1(p),pi_2(p)-1)}	\intersección disponibles(a)
 		posIngreso(a,p)				= pi_2(p) == 1 v pi_2(p)== alto(rastrillaje(a))

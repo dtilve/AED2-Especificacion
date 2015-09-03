@@ -22,7 +22,7 @@ TAD AS’s
 		ingresarHippie: altaSeguridad a x pos p -> altaSeguridad	{p \in disponibles(a) ^ posIngreso(a,p)}
 		moverEstudiante: altaSeguridad a x pos pi x pos pf-> altaSeguridad a2     {pi \in posicionEstudiantes(a) ^ pf \in movimientosPosibles(a,pi)}
 		moverHippie: altaSeguridad a x pos pi -> altaseguridad a2	{pi \in posicionHippies(a) ^ not vacio?(movimientosPosibles(a,pi))}
-		moverAS: altaseguridad a x nat id -> altaseguridad a2		{id \in claves(obtenerAgentes(a)) ^ not vacio?(movimientosPosibles(a,posicionDeAgente(a,id)))}
+		moverAS: altaseguridad a x nat id -> altaseguridad a2		{id \in claves(obtenerAgentes(a)) ^ not vacio?(movimientosPosibles(a,posicionDeAgente(a,id))) ^ sancionesDeAgente(a,id) <= 3}
 	
 	
 	Otras operaciones
@@ -58,13 +58,13 @@ TAD AS’s
 		posicionEstudiantes(ingresarEstudiante(a,p))	= if rodeadoDeHippies(p) then posicionEstudiantes(a) else Ag(p,posicionEstudiantes(a)) fi    //contar(H,a,p) >= 2
 		posicionEstudiantes(ingresarHippie(a,p))	= if rodeadoDeEstudiantes(p) then Ag(p,posicionEstudiantes(a)) else posicionEstudiantes(a) fi
 		posicionEstudiantes(moverEstudiante(a,pi,pf))	= if rodeadoDeHippies(pf) then posicionEstudiantes(a) else posicionEstudiantes(desplazarEstudiante(a,pi,pf)) fi
-		posicionEstudiantes(moverHippie(a,pi))		= if rodeadoDeEstudiantes(p) then Ag(pi,posicionEstudiantes(a)) else posicionEstudiantes(a) fi
+		posicionEstudiantes(moverHippie(a,pi))		= posicionEstudiantes(a) - estudiantesAdyAmenazados(a,moverAMasCercano(pi,posicionEstudiantes(a)))
 		posicionEstudiantes(moverAS(a,id))		= posicionEstudiantes(a)
 		
 		
 		posicionHippies(iniciar(r,d))			= {} //creo q no hace falta
-		posicionHippies(ingresarEstudiante(a,p))	= if rodeadoDeHippies(p) then Ag(p,posicionHippies(a)) else posicionHippies(a) fi
-		posicionHippies(ingresarHippie(a,p))		= if rodeadoDeEstudiantes(p) then posicionHippies(a) else Ag(p,posicionHippies(a)) fi
+		posicionHippies(ingresarEstudiante(a,p))	= if rodeadoDeHippies(a,p) then Ag(p,posicionHippies(a)) else posicionHippies(a) fi
+		posicionHippies(ingresarHippie(a,p))		= if rodeadoDeEstudiantes(a,p) v rodeadoDeAS(a,p) then posicionHippies(a) else Ag(p,posicionHippies(a)) fi
 		posicionHippies(moverEstudiante(a,pi,pf))	= if rodeadoDeHippies(pf) then Ag(p,posicionHippies(a)) else posicionHippies(a) fi 
 		posicionHippies(moverHippie(a,pi))		= Ag(moverHaciaEstudianteMasCercano(pi),(posicionHippie(a) - {pi}))
 		posicionHippies(moverAS(a,id))			= posicionesDeHippies(a) - hippiesAEliminar(a,moverAlHippieMasCercano(a,id),posicionesAdyacentes(moverAlHippieMasCercano(a,id))) \interseccion posicionesDeHippies(a))
@@ -75,7 +75,10 @@ TAD AS’s
 						hippiesAEliminar(a,p,sinUno(cp))
 					fi
 		
-		moverAlHippieMasCercano(a,id) = menorDistancia(rastrillaje(a),menorDistancia(rastrillaje(a),posicionDeAgente(a,id),posicionHippies(a)),movimientosPosibles(a,posicionDeAgente(a,id))))
+		moverAlHippieMasCercano(a,id) = if vacio?(posicionHippies(a)) then moverASalidaMasCercana(a,id) 
+						else menorDistancia(rastrillaje(a),menorDistancia(rastrillaje(a),posicionDeAgente(a,id),posicionHippies(a)),movimientosPosibles(a,posicionDeAgente(a,id))))
+		
+		MoverASalidaMasCercana(a,id) = menorDistancia(rastrillaje(a),menorDistancia(rastrillaje(a),posicionDeAgente(a,id),salidas(rastrillaje(a))),movimientosPosibles(a,posicionDeAgente(a,id))))
 		
 		
 		posIngreso(a,p)		= (( 1<= pi_1(p) <= ancho(rastrillaje(a)) ^ 1==pi_2(p) ) v ( 1<= pi_1(p) <= ancho(rastrillaje(a)) ^ alto(rastrillaje(a))==pi_2(p) ))
@@ -144,6 +147,7 @@ TAD Rastrillaje
 	Otras operaciones
 		libres: rastrillaje -> conj(pos)
 		generarPosiciones : rastrillaje r x nat i x nat j -> conj(pos) { 0 <= i <= ancho(r), 0 <= j <= alto(r) }
+		salidas: rastrillaje r x nat i -> conj(pos) {1 <= i <= ancho(r)}
 		distanciaRectilinea : rastrillaje r x pos p1 x pos p2 -> nat n
 		distancia: nat a x nat b -> nat c
 		menorDistancia: rastrillaje r x pos p x conj(pos) conQ -> pos q		{¬vacio?(conQ) ^ p \in generarPosiciones(r,ancho(r),alto(r)) ^ (\forall q: pos) (q \in conQ => q \in generarPosiciones(r,ancho(r),alto(r)))}
@@ -160,6 +164,7 @@ TAD Rastrillaje
 									Ag((i,j),generarPosiciones(r,i-1,j))
 							else 
 								{}
+		salidas(r,i) = if i == 1 then Ag((1,1),Ag((1,alto(r)),vacio)) else Ag((i,1),Ag((i,alto(r)),salidas(r,i-1)))
 		distanciaRectilinea(r,p,q)= distancia(distancia(pi_1(p),pi_1(q)),distancia(pi_1(p),pi_1(q)))
 		distancia(i,j) = if i >= j then i-j else j-i fi
 		menorDistancia(r,p,conQ))= if #conQ > 1 then 

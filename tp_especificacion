@@ -62,7 +62,7 @@ TAD AS’s
 								 else def(id,(acechar(a,posicionDeAgente(a,id),posicionHippies(a)) , capturas(a,id) , sanciones(a,id) ),obtenerAgentes(a)) fi
 							fi	
 		
-		posicionEstudiantes(iniciar(r,d))		= {}  //creo que no hace falta
+		posicionEstudiantes(iniciar(r,d))		= {}
 		posicionEstudiantes(ingresarEstudiante(a,p))	= if rodeadoDeHippies(p) then posicionEstudiantes(a) else Ag(p,posicionEstudiantes(a)) fi    //contar(H,a,p) >= 2
 		posicionEstudiantes(ingresarHippie(a,p))	= if rodeadoDeEstudiantes(p) then Ag(p,posicionEstudiantes(a)) else posicionEstudiantes(a) fi
 		posicionEstudiantes(moverEstudiante(a,pi,pf))	= if rodeadoDeHippies(pf) v puedeSalir(a,pi,pf) then posicionEstudiantes(a) else Ag(pf,posicionEstudiantes(a)-{pi}) fi
@@ -70,10 +70,10 @@ TAD AS’s
 		posicionEstudiantes(moverAS(a,id))		= posicionEstudiantes(a)
 		
 		
-		posicionHippies(iniciar(r,d))			= {} //creo q no hace falta
+		posicionHippies(iniciar(r,d))			= {} 
 		posicionHippies(ingresarEstudiante(a,p))	= if rodeadoDeHippies(a,p) then Ag(p,posicionHippies(a)) else posicionHippies(a) fi
 		posicionHippies(ingresarHippie(a,p))		= if rodeadoDeEstudiantes(a,p) v rodeadoDeAS(a,p) then posicionHippies(a) else Ag(p,posicionHippies(a)) fi
-		posicionHippies(moverEstudiante(a,pi,pf))	= if rodeadoDeHippies(pf) then Ag(pf,posicionHippies(a)) else posicionHippies(a) fi 
+		posicionHippies(moverEstudiante(a,pi,pf))	= if rodeadoDeHippies(a,pf) then Ag(pf,posicionHippies(a)) else posicionHippies(a) fi 
 		posicionHippies(moverHippie(a,pi))		= Ag(acechar(a,pi,posicionEstudiantes(a)),(posicionHippies(a) - {pi}))
 		posicionHippies(moverAS(a,id))			= posicionesDeHippies(a) - hippiesAEliminar(a,sechar(a,posicionDeAgente(a,id),posicionHippies(a)),posicionesAdyacentes(acechar(a,posicionDeAgente(a,id),posicionHippies(a)))) \interseccion posicionesDeHippies(a))
 		
@@ -126,18 +126,26 @@ TAD AS’s
 						fi
 					fi
 		disponibles(a)				= libres(rastrillaje(a)) - posicionEstudiantes(a) - posicionHippies(a) - posicionAgentes(a)
-		movimientosPosibles (a,p)		= {(pi_1(p)+1,pi_2(p)), (pi_1(p)-1,pi_2(p)), (pi_1(p),pi_2(p)+1), (pi_1(p),pi_2(p)-1)}	\intersección disponibles(a)
+		movimientosPosibles (a,p)		= posicionesAdyacentes(p)\intersección disponibles(a)
 		posIngreso(a,p)				= pi_2(p) == 1 v pi_2(p)== alto(rastrillaje(a))
 		#estudiantes(a)				= #posicionEstudiantes(a)
 		#hippies(a)				= #posicionHippies(a)
+		posicionesAdyacentes(p) 		= {(pi_1(p)+1,pi_2(p)), (pi_1(p)-1,pi_2(p)), (pi_1(p),pi_2(p)+1), (pi_1(p),pi_2(p)-1)}
 		
-		bloqueo?(p,cp) = ¬ vacio?(movimientosPosibles(a,p)) // la aridad de bloqueo es incorrecta en las funciones entonces?
+		bloqueo?(a,p,cp) = if vacio?(cp) then false else (vacio?(movimientosPosibles(a, dameUno(cp)) v bloqueo?(a,p,sinUno(cp))) fi
 		
-		reDefinirDiccAg(a,cid,cap,san)= if vacio?(cid) then obtenerAgentes(a) else redefinirDiccAg(a, sinUno(cid), cap, san, definir(dameUno(cid),(posicionDeAgente(a,dameUno(cid)),capturasDeAgente(a,dameUno(cid))+cap,sancionesDeAgente(a,dameUno(cid))+san), obtenerAgentes(a))) {¬vacio?(dameUno(cid))}
+		reDefinirDiccAg(a,cid,cap,san,d)= if vacio?(cid) then obtenerAgentes(a) else redefinirDiccAg(a, sinUno(cid), cap, san, definir(dameUno(cid),(posicionDeAgente(a,dameUno(cid)),capturasDeAgente(a,dameUno(cid))+cap,sancionesDeAgente(a,dameUno(cid))+san), obtenerAgentes(a)))
 	
 		puedeSalir(a,pi,pf) = posIngreso(a,pi) ^ (pi_2(pf) == 0 v pi_2(pf) == alto(rastrillaje(a))+1)
 		
-FIn TAD
+		rodeadoDeHippies(a,p) 	= #(posicionesAdyacentes(a,p) \interseccion posicionHippies(a)) >= 2
+
+		rodeadoDeEstudiantes(a,p) = (posicionesAdyacentes(a,p) \interseccion generarPosiciones(a)) \contenido posicionEstudiantes(a) ^ vacio?(movimientosPosibles(a,p))
+		
+		rodeadoDeAS (a,p) = # (posicionesAdyacentes(a,p) \interseccion posicionAgentes(a)) >=1 ^ vacio?(movimientosPosibles(a,p))
+		
+		estudiantesAdyAmenazados
+Fin TAD
 
 TAD Rastrillaje
 	Generos

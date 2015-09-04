@@ -34,10 +34,17 @@ TAD AS’s
 		masVigilante: altaSeguridad a -> nat id
 		disponibles: altaSeguridad a -> conj(pos)
 		movimientosPosibles: altaSeguridad a x pos p -> conj(pos)
+		posicionesAdyacentes: altaSeguridad a x pos p -> conj(pos)
 		posIngreso : altaSeguridad a x pos p -> bool
 		#estudiantes: altaSeguridad a -> nat n
 		#hippies: altaSeguridad a -> nat n
-		extender: altaSeduridad a -> altaSeguridad a
+		bloqueo?: pos -> bool
+		reDefinirDiccAg: 
+		rodeadoDeHippies: pos p -> bool
+		rodeadoDeEstudiantes: pos p -> bool
+		puedeSalir: altaSeguridad a x pos pi x pos pf -> bool
+		estudiantesAdyAmenazados: altaSeguridad a x pos p -> conj(pos)
+		
 
 	Axiomas
 		rastrillaje(iniciar(r,d))		= r
@@ -60,7 +67,7 @@ TAD AS’s
 							  else	def(id,(asechar(a,posicionDeAgente(a,id),posicionHippies(a)) , capturas(a,id) , sanciones(a,id) ),obtenerAgentes(a)) fi
 								
 		
-		posicionEstudiantes(iniciar(r,d))		= {}  //creo que no hace falta
+		posicionEstudiantes(iniciar(r,d))		= {}
 		posicionEstudiantes(ingresarEstudiante(a,p))	= if rodeadoDeHippies(p) then posicionEstudiantes(a) else Ag(p,posicionEstudiantes(a)) fi    //contar(H,a,p) >= 2
 		posicionEstudiantes(ingresarHippie(a,p))	= if rodeadoDeEstudiantes(p) then Ag(p,posicionEstudiantes(a)) else posicionEstudiantes(a) fi
 		posicionEstudiantes(moverEstudiante(a,pi,pf))	= if rodeadoDeHippies(pf) v puedeSalir(a,pi,pf) then posicionEstudiantes(a) else Ag(pf,posicionEstudiantes(a)-{pi}) fi
@@ -68,7 +75,7 @@ TAD AS’s
 		posicionEstudiantes(moverAS(a,id))		= posicionEstudiantes(a)
 		
 		
-		posicionHippies(iniciar(r,d))			= {} //creo q no hace falta
+		posicionHippies(iniciar(r,d))			= {}
 		posicionHippies(ingresarEstudiante(a,p))	= if rodeadoDeHippies(a,p) then Ag(p,posicionHippies(a)) else posicionHippies(a) fi
 		posicionHippies(ingresarHippie(a,p))		= if rodeadoDeEstudiantes(a,p) v rodeadoDeAS(a,p) then posicionHippies(a) else Ag(p,posicionHippies(a)) fi
 		posicionHippies(moverEstudiante(a,pi,pf))	= if rodeadoDeHippies(pf) then Ag(pf,posicionHippies(a)) else posicionHippies(a) fi 

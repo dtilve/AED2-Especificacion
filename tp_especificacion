@@ -53,7 +53,12 @@ TAD AS’s
 		obtenerAgentes(ingresarHippie(a,p)) 	= obtenerAgentes(a)
 		obtenerAgentes(moverEstudiante(a,pi,pf))= obtenerAgentes(a)
 		obtenerAgentes(moverHippie(a,pi)) 	= obtenerAgentes(a)
-		obtenerAgentes(moverAS(a,id)) 		= definir(id,  )
+		obtenerAgentes(moverAS(a,id)) 		= if bloqueo?(asechar(posicionDeAgente(a,id),posicionHippies(a)) then
+								if bloqueo?(asechar(posicionDeAgente(a,id),posicionEstudiantes(a)) then
+									reDefinirDiccAg(a,participantes(a,asechar(a, posicionDeAgente(a,id),posicionHippies(a) ))),1,1)
+								else    reDefinirDiccAg(a,participantes(moverAS(a,id),asechar(a, posicionDeAgente(a,id),posicionHippies(a) ))),1,0) fi
+							  else	def(id,(asechar(a,posicionDeAgente(a,id),posicionHippies(a)) , capturas(a,id) , sanciones(a,id) ),obtenerAgentes(a)) fi
+								
 		
 		posicionEstudiantes(iniciar(r,d))		= {}  //creo que no hace falta
 		posicionEstudiantes(ingresarEstudiante(a,p))	= if rodeadoDeHippies(p) then posicionEstudiantes(a) else Ag(p,posicionEstudiantes(a)) fi    //contar(H,a,p) >= 2
@@ -124,7 +129,9 @@ TAD AS’s
 		#estudiantes(a)				= #posicionEstudiantes(a)
 		#hippies(a)				= #posicionHippies(a)
 		
-		funcion_que_dejamo_pa_depue(algo) = 
+		bloqueo?(p,cp) =
+		
+		reDefinirDiccAg(a,cid,cap,san)=
 		
 		puedeSalir(a,pi,pf) = posIngreso(a,pi) ^ (pi_2(pf) == 0 v pi_2(pf) == alto(rastrillaje(a))+1)
 		

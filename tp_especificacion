@@ -1,32 +1,38 @@
-TAD D_agentes es Diccionario(nat,tupla(pos,nat,nat)) 	
+TAD D_agentes es Diccionario(nat,tupla(pos,nat,nat))
 TAD Pos es tupla (nat,nat)
 
 TAD AS’s
 	Generos
 		altaSeguridad
 	Igualdad observacional
+		(/forall a,a': altaSeguridad) ( a =obs a' \Leftrightarrow 
+			(
+			rastrillaje(a) =obs rastrillaje(a') ^l 
+			obtenerAgentes(a) =obs obtenerAgentes(a') ^
+			posicionEstudiantes(a) =obs posicionEstudiantes(a') ^
+			posicionHippies(a) =obs posicionHippies(a')
+			))
 	Usa
 		nat, bool 
 	Exporta
-
+		altaSeguridad, generadores, observadores
 	Observadores basicos
 		rastrillaje: altaSeguridad a -> rastrillaje r
 		obtenerAgentes:	altaSeguridad a -> d_agentes 
 		posicionEstudiantes: altaSeguridad a -> conj(pos) c
 		posicionHippies: altaSeguridad a -> conj(pos) c
 		
-
 	Generadores
-		iniciar: rastrillaje r x d_agentes d -> altaSeguridad	{#conjAgentes = #agentes(r) ^l conjPosAgentes \subseteq libres(r)}
-		ingresarEstudiante: altaSeguridad a x pos p -> altaSeguridad	{p \in disponibles(a) ^ posIngreso(a,p)}
-		ingresarHippie: altaSeguridad a x pos p -> altaSeguridad	{p \in disponibles(a) ^ posIngreso(a,p)}
-		moverEstudiante: altaSeguridad a x pos pi x pos pf-> altaSeguridad a2     {pi \in posicionEstudiantes(a) ^ (pf \in movimientosPosibles(a,pi) v puedeSalir(a,pi,pf))}
-		moverHippie: altaSeguridad a x pos pi -> altaseguridad a2	{pi \in posicionHippies(a) ^ not vacio?(movimientosPosibles(a,pi))}
-		moverAS: altaseguridad a x nat id -> altaseguridad a2		{id \in claves(obtenerAgentes(a)) ^ not vacio?(movimientosPosibles(a,posicionDeAgente(a,id))) ^ sancionesDeAgente(a,id) <= 3}
+		iniciar: rastrillaje r x d_agentes d -> altaSeguridad			{conjPosAgentes(d) \subseteq libres(r)}
+		ingresarEstudiante: altaSeguridad a x pos p -> altaSeguridad		{p \in disponibles(a) ^ posIngreso(a,p)}
+		ingresarHippie: altaSeguridad a x pos p -> altaSeguridad		{p \in disponibles(a) ^ posIngreso(a,p)}
+		moverEstudiante: altaSeguridad a x pos pi x pos pf-> altaSeguridad a2	{pi \in posicionEstudiantes(a) ^ (pf \in movimientosPosibles(a,pi) v puedeSalir(a,pi,pf))}
+		moverHippie: altaSeguridad a x pos pi -> altaseguridad a2		{pi \in posicionHippies(a) ^ not vacio?(movimientosPosibles(a,pi))}
+		moverAS: altaseguridad a x nat id -> altaseguridad a2			{id \in claves(obtenerAgentes(a)) ^ not vacio?(movimientosPosibles(a,posicionDeAgente(a,id))) ^ sancionesDeAgente(a,id) <= 3}
 	
 	
 	Otras operaciones
-
+		conjPosAgentes: d_agentes -> conj(pos)
 		posicionAgentes: altaSeguridad a -> conj(pos)
 		posicionDeAgente: altaSeguridad a x nat n -> pos p
 		capturasDeAgente: altaSeguridad a x nat id -> nat kills
@@ -38,9 +44,21 @@ TAD AS’s
 		#estudiantes: altaSeguridad a -> nat n
 		#hippies: altaSeguridad a -> nat n
 		extender: altaSeduridad a -> altaSeguridad a
+		conjCapturas: altaSeguridad a x nat id -> conj(nat,nat) 
+		tieneMasCapturas: conj(nat,nat) -> (nat,nat)
+		rodeadoDeHippies: pos p -> bool b
+		rodeadoDeEstudiantes: pos p -> bool b
+		hippieAmenazado?: pos pi -> bool
+		moverHaciaHippieMasCercano: pos pi -> pos pf
+		moverHaciaEstudianteMasCercano: pos pi -> pos pf
+		hippieMasCercano: pos pi -> pos h
 
 	Axiomas
-		rastrillaje(iniciar(r,d))		= r
+		(\forall a: altaSeguridad) (\forall r: rastrillaje) 
+		(\forall ca: d_agentes) (\forall p,pi,pf: pos) (\forall id,n: nat)
+		(\forall c: conj(nat,nat))
+		
+		rastrillaje(iniciar(r,ca))		= r
 		rastrillaje(ingresarEstudiante(a,p))	= rastrillaje(a)
 		rastrillaje(ingresarHippie(a,p))	= rastrillaje(a)
 		rastrillaje(moverEstudiante(a,pi,pf))	= rastrillaje(a)
@@ -48,7 +66,7 @@ TAD AS’s
 		rastrillaje(moverAS(a,pi))		= rastrillaje(a)
 		
 		
-		obtenerAgentes(iniciar(r,d))		= d
+		obtenerAgentes(iniciar(r,ca))		= ca
 		obtenerAgentes(ingresarEstudiante(a,p)) = obtenerAgentes(a)
 		obtenerAgentes(ingresarHippie(a,p)) 	= obtenerAgentes(a)
 		obtenerAgentes(moverEstudiante(a,pi,pf))= obtenerAgentes(a)
@@ -62,15 +80,17 @@ TAD AS’s
 								 else def(id,(acechar(a,posicionDeAgente(a,id),posicionHippies(a)) , capturas(a,id) , sanciones(a,id) ),obtenerAgentes(a)) fi
 							fi	
 		
-		posicionEstudiantes(iniciar(r,d))		= {}
-		posicionEstudiantes(ingresarEstudiante(a,p))	= if rodeadoDeHippies(p) then posicionEstudiantes(a) else Ag(p,posicionEstudiantes(a)) fi    //contar(H,a,p) >= 2
+		posicionEstudiantes(iniciar(r,ca))		= {}
+		posicionEstudiantes(ingresarEstudiante(a,p))	= if rodeadoDeHippies(p) then posicionEstudiantes(a) else Ag(p,posicionEstudiantes(a)) fi
 		posicionEstudiantes(ingresarHippie(a,p))	= if rodeadoDeEstudiantes(p) then Ag(p,posicionEstudiantes(a)) else posicionEstudiantes(a) fi
 		posicionEstudiantes(moverEstudiante(a,pi,pf))	= if rodeadoDeHippies(pf) v puedeSalir(a,pi,pf) then posicionEstudiantes(a) else Ag(pf,posicionEstudiantes(a)-{pi}) fi
-		posicionEstudiantes(moverHippie(a,pi))		= posicionEstudiantes(a) - estudiantesAdyAmenazados(a,acechar(a,pi,posicionEstudiantes(a)))
+		posicionEstudiantes(moverHippie(a,pi))		= posicionEstudiantes(a) - estudiantesAdyAmenazados(a,)
 		posicionEstudiantes(moverAS(a,id))		= posicionEstudiantes(a)
 		
 		
-		posicionHippies(iniciar(r,d))			= {} 
+		posicionEstudiantes(moverHippie(a,pi))		= posicionEstudiantes(a) - (if bloqueo?(a,acechar(a,pi,posicionEstudiantes(a)),posicionesAdyacentes(a,acechar(a,pi,posicionEstudiantes(a)) \interseccion posicionEstudiantes(a))
+												else {}
+		posicionHippies(iniciar(r,ca))			= {} 
 		posicionHippies(ingresarEstudiante(a,p))	= if rodeadoDeHippies(a,p) then Ag(p,posicionHippies(a)) else posicionHippies(a) fi
 		posicionHippies(ingresarHippie(a,p))		= if rodeadoDeEstudiantes(a,p) v rodeadoDeAS(a,p) then posicionHippies(a) else Ag(p,posicionHippies(a)) fi
 		posicionHippies(moverEstudiante(a,pi,pf))	= if rodeadoDeHippies(a,pf) then Ag(pf,posicionHippies(a)) else posicionHippies(a) fi 
@@ -90,20 +110,27 @@ TAD AS’s
 		
 		
 		posIngreso(a,p)		= (( 1<= pi_1(p) <= ancho(rastrillaje(a)) ^ 1==pi_2(p) ) v ( 1<= pi_1(p) <= ancho(rastrillaje(a)) ^ alto(rastrillaje(a))==pi_2(p) ))
+		
 		posicionAgentes(a,n) 	= 	if (n==0) then ///tomo que los agentes se empiezan a contar desde 1 por ser nat
 							{}
 						else 
 							posicionDeAgente(a,n) u posicionAgentes(a,n-1)
 						fi
+		
 		posicionDeAgente(a,id) 	= pi_1(obtener(n,obtenerAgentes(a)))
+		
 		capturasDeAgente(a,id) 	= pi_2(obtener(n,obtenerAgentes(a)))				//-> nat kills
+		
 		sancionesDeAgente(a,id) = pi_3(obtener(n,obtenerAgentes(a)))				//-> nat sanciones
+		
 		masVigilante(a) 	=	pi_1(tieneMasCapturas(conjCapturas(a,1)))		//-> nat id
+		
 		conjCapturas(a,n)	=	if (¬ def?(n)) then
 							{}
 						else
 							(n,capturasDeAgente(a,n)) u conjCapturas(a,n+1)
 						fi
+		
 		tieneMasCapturas(c) = 	if (#c==2) then
 						if pi_2(dameUno(c)) >= pi_2(dameUno(sinUno(c))) then
 							if pi_2(dameUno(c)) == pi_2(dameUno(sinUno(c))) then
@@ -125,11 +152,17 @@ TAD AS’s
 							tieneMasSanciones(dameUno(sinUno(c)) u sinUno(sinUno(c)))
 						fi
 					fi
+		
 		disponibles(a)				= libres(rastrillaje(a)) - posicionEstudiantes(a) - posicionHippies(a) - posicionAgentes(a)
+		
 		movimientosPosibles (a,p)		= posicionesAdyacentes(p)\intersección disponibles(a)
+		
 		posIngreso(a,p)				= pi_2(p) == 1 v pi_2(p)== alto(rastrillaje(a))
+		
 		#estudiantes(a)				= #posicionEstudiantes(a)
+		
 		#hippies(a)				= #posicionHippies(a)
+		
 		posicionesAdyacentes(p) 		= {(pi_1(p)+1,pi_2(p)), (pi_1(p)-1,pi_2(p)), (pi_1(p),pi_2(p)+1), (pi_1(p),pi_2(p)-1)}
 		
 		bloqueo?(a,p,cp) = if vacio?(cp) then false else (vacio?(movimientosPosibles(a, dameUno(cp)) v bloqueo?(a,p,sinUno(cp))) fi
@@ -144,16 +177,24 @@ TAD AS’s
 		
 		rodeadoDeAS (a,p) = # (posicionesAdyacentes(a,p) \interseccion posicionAgentes(a)) >=1 ^ vacio?(movimientosPosibles(a,p))
 		
-		estudiantesAdyAmenazados
+		conjPosAgentes(d) = if vacio?(d) then {} else prim(dameUno(d)) u conjPosAgentes(sinUno(d))
+
 Fin TAD
 
 TAD Rastrillaje
 	Generos
 		rastrillaje
 	Igualdad observacional
+		(\forall r,r': rastrillaje) ( r = obs r' \Leftrightarrow 
+			(
+			ostaculos(r) =obs obstaculos(r') ^
+			alto(r) =obs alto(r') ^
+			ancho(r) =obs ancho(r')
+			))
 	Usa
 		nat, Bool 
 	Exporta
+		rastrillaje, generadores, observadores, libres, distancia
 	Generadores
 		rastrillar: nat ancho x nat altura x conj(pos) conjObs -> rastrillaje	{ancho>0 ^ alto >0 ^ (/forall x:pos) x \in conjObs => 1<= pi_1x <= ancho ^ 1<= pi_2x <= alto}
 
@@ -170,11 +211,17 @@ TAD Rastrillaje
 		distancia: nat a x nat b -> nat c
 		menorDistancia: rastrillaje r x pos p x conj(pos) conQ -> pos q		{p \in generarPosiciones(r,ancho(r),alto(r)) ^ (\forall q: pos) (q \in conQ => q \in generarPosiciones(r,ancho(r),alto(r)))}
 	
-	Axiomas (forall r:rastrillaje) (forall i,j,a,h: nat) (forall p,q: pos) (forall co:conj(pos) 
+	Axiomas 
+		(forall r:rastrillaje) (forall i,j,a,h: nat) (forall p,q: pos) (forall co:conj(pos) 
+		
 		obstaculos(rastrillar(a,h,co))	= co
+		
 		alto (rastrillar(a,h,co))	= h
+		
 		ancho (rastrillar (a, h, co)) 	= a
+		
 		libres(r)				= generarPosiciones(r,ancho(r),alto(r)) - obstaculos(r)  	
+		
 		generarPosiciones(r, i, j) 		= if(i>0)then
 								if (j>0) then
 									Ag((i,j),generarPosiciones(r,i, j-1))
@@ -182,14 +229,21 @@ TAD Rastrillaje
 									Ag((i,j),generarPosiciones(r,i-1,j))
 							else 
 								{}
+		
 		salidas(r,i) = if i == 1 then Ag((1,1),Ag((1,alto(r)),vacio)) else Ag((i,1),Ag((i,alto(r)),salidas(r,i-1)))
+		
 		distanciaRectilinea(r,p,q)= distancia(distancia(pi_1(p),pi_1(q)),distancia(pi_1(p),pi_1(q)))
+		
 		distancia(i,j) = if i >= j then i-j else j-i fi
-		menorDistancia(r,p,conQ)) =    if vacio?(conQ) then p else
-					        (if #conQ > 1 then 
-						menor(distanciaRectilinea(r,p,dameUno(conQ)),menorDistancia(r,p,sinUno(conQ)))
+		
+		menorDistancia(r,p,conQ)) =    if vacio?(conQ) then 
+							p 
 						else
-						dameUno(conQ)
-						fi)
+					        	if #conQ > 1 then 
+								menor(distanciaRectilinea(r,p,dameUno(conQ)),menorDistancia(r,p,sinUno(conQ)))
+							else
+								dameUno(conQ)
+							fi
+						fi
 						fi
 Fin TAD

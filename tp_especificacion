@@ -53,12 +53,14 @@ TAD AS’s
 		obtenerAgentes(ingresarHippie(a,p)) 	= obtenerAgentes(a)
 		obtenerAgentes(moverEstudiante(a,pi,pf))= obtenerAgentes(a)
 		obtenerAgentes(moverHippie(a,pi)) 	= obtenerAgentes(a)
-		obtenerAgentes(moverAS(a,id)) 		= if bloqueo?(acechar(posicionDeAgente(a,id),posicionHippies(a)) then
-								if bloqueo?(acechar(posicionDeAgente(a,id),posicionEstudiantes(a)) then
-									reDefinirDiccAg(a,participantes(a,acechar(a, posicionDeAgente(a,id),posicionHippies(a) ))),1,1)
-								else    reDefinirDiccAg(a,participantes(moverAS(a,id),acechar(a, posicionDeAgente(a,id),posicionHippies(a) ))),1,0) fi
-							  else	def(id,(acechar(a,posicionDeAgente(a,id),posicionHippies(a)) , capturas(a,id) , sanciones(a,id) ),obtenerAgentes(a)) fi
-								
+		obtenerAgentes(moverAS(a,id)) 		= if bloqueo?(moverAS(a,id), posicionesAdyacentes(acechar(posicionDeAgente(a,id), posicionHippies(a)) \ interseccion posicionHippies(a)) then
+								if bloqueo?(moverAS(a,id), posicionesAdyacentes(acechar(posicionDeAgente(a,id),posicionEstudiantes(a) \interseccion posicionesEstudiantes(a)) then
+									reDefinirDiccAg(a,participantes(a,acechar(a, posicionDeAgente(a,id),posicionHippies(a) ))),1,1, obtenerAgentes(a))
+								else    reDefinirDiccAg(a,participantes(moverAS(a,id),acechar(a, posicionDeAgente(a,id),posicionHippies(a) ))),1,0, obtenerAgentes(a)) fi
+							  else 	if bloqueo?(moverAS(a,id),posicionesAdyacentes(acechar((posicionDeAgente(a,id),posicionHippies(a)))) /interseccion posicionEstudiantes(a)) then
+									reDefinirDiccAg(a,participantes(a,acechar(a, posicionDeAgente(a,id),posicionHippies(a) ))),0,1,obtenerAgentes(a))
+								 else def(id,(acechar(a,posicionDeAgente(a,id),posicionHippies(a)) , capturas(a,id) , sanciones(a,id) ),obtenerAgentes(a)) fi
+							fi	
 		
 		posicionEstudiantes(iniciar(r,d))		= {}  //creo que no hace falta
 		posicionEstudiantes(ingresarEstudiante(a,p))	= if rodeadoDeHippies(p) then posicionEstudiantes(a) else Ag(p,posicionEstudiantes(a)) fi    //contar(H,a,p) >= 2

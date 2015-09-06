@@ -83,7 +83,7 @@ TAD AS’s
 		posicionEstudiantes(iniciar(r,ca))		= {}
 		posicionEstudiantes(ingresarEstudiante(a,p))	= if rodeadoDeHippies(p) then posicionEstudiantes(a) else Ag(p,posicionEstudiantes(a)) fi
 		posicionEstudiantes(ingresarHippie(a,p))	= if rodeadoDeEstudiantes(p) then Ag(p,posicionEstudiantes(a)) else posicionEstudiantes(a) fi
-		posicionEstudiantes(moverEstudiante(a,pi,pf))	= if rodeadoDeHippies(pf) v puedeSalir(a,pi,pf) then posicionEstudiantes(a) else Ag(pf,posicionEstudiantes(a)-{pi}) fi
+		posicionEstudiantes(moverEstudiante(a,pi,pf))	= if rodeadoDeHippies(pf) v puedeSalir(a,pi,pf) then posicionEstudiantes(a) else Ag(pf,posicionEstudiantes(a)-{pi}) U losHippiesRodeados(moverEstudiante(a,pi,pf),posicionesAdyacentes(pf) \interseccion posicionHippies(a)) fi
 		posicionEstudiantes(moverHippie(a,pi))		= posicionEstudiantes(a) - (if bloqueo?(a,acechar(a,pi,posicionEstudiantes(a)),posicionesAdyacentes(a,acechar(a,pi,posicionEstudiantes(a)) \interseccion posicionEstudiantes(a))
 												else {}
 		posicionEstudiantes(moverAS(a,id))		= posicionEstudiantes(a)
@@ -91,7 +91,7 @@ TAD AS’s
 		posicionHippies(iniciar(r,ca))			= {} 
 		posicionHippies(ingresarEstudiante(a,p))	= if rodeadoDeHippies(a,p) then Ag(p,posicionHippies(a)) else posicionHippies(a) fi
 		posicionHippies(ingresarHippie(a,p))		= if rodeadoDeEstudiantes(a,p) v rodeadoDeAS(a,p) then posicionHippies(a) else Ag(p,posicionHippies(a)) fi
-		posicionHippies(moverEstudiante(a,pi,pf))	= if rodeadoDeHippies(a,pf) then Ag(pf,posicionHippies(a)) else posicionHippies(a) fi 
+		posicionHippies(moverEstudiante(a,pi,pf))	= if rodeadoDeHippies(a,pf) then Ag(pf,posicionHippies(a)) else posicionHippies(a) - losHippiesRodeados(moverEstudiante(a,pi,pf),posicionesAdyacentes(pf) \inteseccion posicionHippies(a)) fi 
 		posicionHippies(moverHippie(a,pi))		= Ag(acechar(a,pi,posicionEstudiantes(a)),(posicionHippies(a) - {pi}))
 		posicionHippies(moverAS(a,id))			= posicionesDeHippies(a) - hippiesAEliminar(a,sechar(a,posicionDeAgente(a,id),posicionHippies(a)),posicionesAdyacentes(acechar(a,posicionDeAgente(a,id),posicionHippies(a)))) \interseccion posicionesDeHippies(a))
 		
@@ -105,6 +105,10 @@ TAD AS’s
 		#estudiantes(a)				= #posicionEstudiantes(a)
 		
 		#hippies(a)				= #posicionHippies(a)
+		
+		losHippiesRodeados(a,cjh) = if vacio?(cjh) then {} 
+						else if rodeadoDeEstudiantes(a,dameUno(cjh)) then Ag(dameUno(cjh),losHippiesRodeados(a,sinUno(cjh)))
+							else loshippiesRodeados(a,SinUno(cjh)) fi fi
 		
 		acechar(a,p,cp) = if vacio?(cp) then masCercano(a,p,salidas(rastrillaje(a))-disponibles(a))
 						else masCercano(a,p,cp) fi

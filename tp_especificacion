@@ -145,11 +145,59 @@
 
 \tadAxioma{capturasDeAgente(a,id)}{$\Pi_2$(obtener(n,obtenerAgentes(a)))}
 
-\tadAxioma{conjCapturas(a,n)}{\IF $\neg$(def?(n)) THEN {} ELSE (n,capturasDeAgente(a,n)) $\cup$ conjCapturas(a,n+1) FI}
+\tadAxioma{conjCapturas(a,n)}{\IF $\neg$(def?(n)) THEN {} ELSE {(n,capturasDeAgente(a,n))} $\cup$ conjCapturas(a,n+1) FI}
 
+\tadAxioma{conjPosAgentes(d)}{\IF \emptyset$?($d$) THEN {} ELSE {$\Pi_1$(dameUno(d))} $\cup$ conjPosAgentes(sinUno(d)) FI}
 
-\tadAxioma{}{}
-\IF THEN ELSE FI
+\tadAxioma{disponibles(a)}{libres(rastrillaje(a)) - posicionEstudiantes(a) - posicionHippies(a) - posicionAgentes(a)}
+
+\tadAxioma{hippiesAEliminar(a,p,cp)}{\IF \emptyset$?($movimientosPosibles(a,dameUno(cp)$)- {p} THEN Ag(dameUno(cp),hippiesAEliminar(a,p,sinUno(cp))) ELSE hippiesAEliminar(a,p,sinUno(cp)) FI}
+
+\tadAxioma{masCercano(a,p,cp)}{menorDistancia(rastrillaje(a),menorDistancia(rastrillaje(a),p,cp),movimientosPosibles(a,p)))}
+
+\tadAxioma{masVigilante(a)}{$\Pi_1$(tieneMasCapturas(conjCapturas(a,1)))}
+
+\tadAxioma{movimientosPosibles (a,p)}{posicionesAdyacentes(p) $\cap$ disponibles(a)}
+
+\tadAxioma{posicionAgentes(a)}{posicionAgentes'(obtenerAgentes(a))}
+
+\tadAxioma{posicionAgentes'(d)}{\IF \emptyset$?($claves(d)$) THEN {} ELSE Ag(pi_1(obtener(dameUno(claves(d)))),posicionAgentes'(borrar(dameUno(claves(d))),d)) FI}
+
+\tadAxioma{posicionDeAgente(a,id)}{$\Pi_1$(obtener(n,obtenerAgentes(a)))}
+
+\tadAxioma{posicionesAdyacentes(p)}{($\Pi_1$(p)+1,$\Pi_2$(p)), ($\Pi_1$(p)-1,$\Pi_2$(p)), ($\Pi_1$(p),$\Pi_2$(p)+1), ($\Pi_1$(p),$\Pi_2$(p)-1)}
+
+\tadAxioma{posIngreso(a,p}{$\Pi_2$(p) == 1 $\lor$ $\Pi_2$(p) == alto(rastrillaje(a)}
+
+\tadAxioma{puedeSalir(a,pi,pf)}{posIngreso(a,pi) $\land$ ($\Pi_2$(pf)==0 $\lor$ $\Pi_2$(pf)==alto(rastrillaje(a))+1)}
+
+\tadAxioma{reDefinirDiccAg(a,cid,cap,san,d}{\IF \emptyset$?($cid$) THEN obtenerAgentes(a) ELSE redefinirDiccAg(a, sinUno(cid), cap, san, definir(dameUno(cid),(posicionDeAgente(a,dameUno(cid)),capturasDeAgente(a,dameUno(cid))+cap,sancionesDeAgente(a,dameUno(cid))+san), obtenerAgentes(a))) FI}
+
+\tadAxioma{rodeadoDeAS (a,p)}{(#(posicionesAdyacentes(a,p) $\cap$ posicionAgentes(a)) >= 1) $\land$ \emptyset$?($movimientosPosibles(a,p)$)}
+
+\tadAxioma{rodeadoDeEstudiantes(a,p)}{ ((posicionesAdyacentes(a,p) $\cap$ generarPosiciones(a)) $\subseteq$ posicionEstudiantes(a)) $\land$ \emptyset$?($movimientosPosibles(a,p)$)}
+
+\tadAxioma{rodeadoDeHippies(a,p)}{#(posicionesAdyacentes(a,p) $\cap$ posicionHippies(a)) >= 2}
+
+\tadAxioma{sancionesDeAgente(a,id)}{$\Pi_3$(obtener(n,obtenerAgentes(a)))}
+
+\tadAxioma{tieneMasCapturas(c)}{\IF (#c==2)THEN 
+                                  \IF $\Pi_2$(dameUno(c)) >= $\Pi_2$(dameUno(sinUno(c)))THEN 
+                                    \IF $\Pi_2$(dameUno(c)) == $\Pi_2$(dameUno(sinUno(c)))THEN 
+                                      \IF $\Pi_1$(dameUno(c)) < $\Pi_1$(dameUno(sinUno(c))) THEN 
+                                        dameUno(c)
+                                      ELSE dameUno(sinUno(c)) FI
+                                    ELSE dameUno(c) FI 
+                                  ELSE dameUno(sinUno(c)) FI 
+                                ELSE 
+                                  \IF $\Pi_2$(dameUno(c)) >= $\Pi_2$(dameUno(sinUno(c)))THEN 
+                                    \IF $\Pi_2$(dameUno(c)) == $\Pi_2$(dameUno(sinUno(c)))THEN 
+                                      \IF $\Pi_1$(dameUno(c)) < $\Pi_1$(dameUno(sinUno(c))) THEN 
+                                        tieneMasSanciones(dameUno(c) $\cup$ sinUno(sonUno(c)))
+                                      ELSE tieneMasSanciones(dameUno(sinUno(c)) $\cup$ sinUno(sinUno(c))) FI
+                                    ELSE tieneMasSanciones(dameUno(c) $\cup$ sinUno(sonUno(c))) FI 
+                                  ELSE tieneMasSanciones(dameUno(sinUno(c)) $\cup$ sinUno(sinUno(c))) FI 
+                                FI}
 
 \end{tad}
 

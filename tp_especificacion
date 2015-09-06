@@ -201,4 +201,49 @@
 
 \end{tad}
 
+
+
+\begin{tad}{\tadNombre{Rastrillaje}}
+
+\tadIgualdadObservacional{r}{r'}{rastrillaje}{ ($ r  \igobs r') \Leftrightarrow (ostaculos(r) \igobs ostaculos(r')) \land (alto(r) \igobs alto(r')) \land (ancho(r) \igobs ancho(r')) $}
+
+\tadGeneros{rastrillaje}
+
+\tadExporta{rastrillaje, generadores, observadores, libres, distancia}
+
+\tadUsa{\tadNombre{Bool, Nat}}
+
+\tadObservadores
+
+\tadOperacion{alto}{rastrillaje}{nat}{}
+\tadOperacion{ancho}{rastrillaje}{nat}{}
+\tadOperacion{obstaculos}{rastrillaje}{conj(pos) conjObs}{}
+
+\tadGeneradores
+
+\tadOperacion{rastrillar}{nat ancho, nat altura, conj(pos) conjObs}{rastrillaje}{ (ancho>0) $\land$ (alto>0) $\land$ ( (/forall x:pos) x \in conjObs \Rightarrow (1 $\leq$ $\Pi_1$(x)) $\land$ ($\Pi_1$(x) $\leq$ ancho) $\land$ (1 $\leq$ $\Pi_2$(x)) $\land$ ($\Pi_2$(x) $\leq$ alto) )}
+
+\tadOtrasOperaciones
+
+\tadOperacion{distancia}{nat a, nat b}{nat c}{}
+\tadOperacion{distanciaRectilinea}{rastrillaje r, pos p1, pos p2}{nat n}{}
+\tadOperacion{generarPosiciones}{rastrillaje r, nat i, nat j}{conj(pos)}{(0 $\leq$ i) $\land$ (i $\leq$ ancho(r)) $\land$ (0 $\leq$ j) $\land$ (j $\leq$ alto(r))}
+\tadOperacion{libres}{rastrillaje}{conj(pos)}{}
+\tadOperacion{menorDistancia}{rastrillaje r, pos p, conj(pos) conQ}{pos q}{( p \in generarPosiciones(r,ancho(r),alto(r)) ) $\land$ ((\forall q: pos) (q \in conQ \Rightarrow q \in generarPosiciones(r,ancho(r),alto(r))))}
+\tadOperacion{salidas}{rastrillaje r, nat i}{conj(pos)}{(1 $\leq$ i) $\land$ (i $\leq$ ancho(r))}
+
+\tadAxiomas[\paratodo{rastrillaje}{r}, \paratodo{nat}{i,j,a,h}, \paratodo{pos}{p,q}, \paratodo{conj(pos)}{co}]
+
+\tadAxioma{alto (rastrillar(a,h,co))}{h}
+\tadAxioma{ancho (rastrillar (a, h, co))}{a}
+\tadAxioma{obstaculos(rastrillar(a,h,co))}{co}
+\tadAxioma{distancia(i,j)}{\IF i $\geq$ j THEN i-j ELSE j-i FI}
+\tadAxioma{distanciaRectilinea(r,p,q)}{distancia(distancia($\Pi_1$(p),$\Pi_1$(q)),distancia($\Pi_1$(p),$\Pi_1$(q)))}
+\tadAxioma{generarPosiciones(r, i, j)}{\IF i>0 THEN \IF j>0 THEN Ag((i,j),generarPosiciones(r,i, j-1)) ELSE Ag((i,j),generarPosiciones(r,i-1,j)) FI ELSE {} FI}
+\tadAxioma{libres(r)}{generarPosiciones(r,ancho(r),alto(r)) - obstaculos(r)} 
+\tadAxioma{menorDistancia(r,p,conQ))}{\IF \emptyset$?(conQ) THEN p ELSE \IF #conQ > 1 THEN menor(distanciaRectilinea(r,p,dameUno(conQ)),menorDistancia(r,p,sinUno(conQ))) ELSE dameUno(conQ) FI FI}
+\tadAxioma{salidas(r,i)}{\IF i == 1 THEN Ag((1,1),Ag((1,alto(r)),vacio)) ELSE Ag((i,1),Ag((i,alto(r)),salidas(r,i-1)))FI}
+
+\end{tad}
+
 \end{document}

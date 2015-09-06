@@ -86,18 +86,19 @@
 \tadOperacion{\#hippies}{altaSeguridad/a}{nat}{}
 \tadOperacion{acechar}{altaSeguridad/a,pos/p,conj(pos)/cp}{pos}{}
 \tadOperacion{bloqueo?}{altaSeguridad/a,pos/p,conj(pos)/cp}{bool}{}
-\tadOperacion{capturasDeAgente}{altaSeguridad/a,nat/id}{nat}{}
-\tadOperacion{conjCapturas}{altaSeguridad/a,nat/id}{conj(nat,at)}{}
+\tadOperacion{capturasDeAgente}{altaSeguridad/a,nat/id}{nat}{id $\in$ claves(obtenerAgentes(a))}
+\tadOperacion{conjCapturas}{altaSeguridad/a,nat/id}{conj(nat,at)}{id $\in$ claves(obtenerAgentes(a))}
 \tadOperacion{conjPosAgentes}{d\_agentes/d}{conj(pos)}{}
 \tadOperacion{disponibles}{altaSeguridad/a}{conj(pos)}{}
-\tadOperacion{estudiantesAHippies}{altaSeguridad/a,conj(pos)/cjE}{conj(pos)}{}
+\tadOperacion{estudiantesAHippies}{altaSeguridad/a,conj(pos)/cjE}{conj(pos)}{cjE $\subseteq$ posicionEstudiantes(a)}
 \tadOperacion{hippiesAEliminar}{altaSeguridad/a,pos/p,conj(pos)/cp}{conj(pos)}{}
 \tadOperacion{masCercano}{altaSeguridad/a,pos/p,conj(pos)/cp}{pos}{}
 \tadOperacion{masVigilante}{altaSeguridad/a}{nat}{}
 \tadOperacion{movimientosPosibles}{altaSeguridad/a,pos/p}{conj(pos)}{}
+\tadOperacion{losHippiesRodeados}{altaSeguridad/a,conj(pos)/cjh}{conj(pos)}{cjh $\subseteq$ posicionHippies(a)}
 \tadOperacion{posicionAgentes}{altaSeguridad/a}{conj(pos)}{}
 \tadOperacion{posicionAgentes'}{d\_agentes/d}{conj(pos)}{}
-\tadOperacion{posicionDeAgente}{altaSeguridad/a,nat/n}{pos}{}
+\tadOperacion{posicionDeAgente}{altaSeguridad/a,nat/id}{pos}{id $\in$ claves(obtenerAgentes(a))}
 \tadOperacion{posicionesAdyacentes}{pos/p}{conj(pos)}{}
 \tadOperacion{posIngreso}{altaSeguridad/a,pos/p}{bool}{}
 \tadOperacion{puedeSalir}{altaSeguridad/a,pos/pi,pos/pf}{bool}{}
@@ -105,8 +106,8 @@
 \tadOperacion{rodeadoDeAS}{altaSeguridad/a,pos/p}{bool}{}
 \tadOperacion{rodeadoDeEstudiantes}{altaSeguridad/a,pos/p}{bool}{}
 \tadOperacion{rodeadoDeHippies}{altaSeguridad/a,pos/p}{bool}{}
-\tadOperacion{sancionesDeAgente}{altaSeguridad/a,nat/id}{nat}{}
-\tadOperacion{tieneMasCapturas}{conj(nat,at)}{(nat,nat)}{}
+\tadOperacion{sancionesDeAgente}{altaSeguridad/a,nat/id}{nat}{id $\in$ claves(obtenerAgentes(a))}
+\tadOperacion{tieneMasCapturas}{conj(nat \, nat)}{(nat,nat)}{}
 
 
 \tadAxiomas[\paratodo{altaSeguridad}{a}, \paratodo{rastrillaje}{r}, \paratodo{d\_agentes}{d}, \paratodo{pos}{p,pi,pf}, \paratodo{id,n}{nat}, \paratodo{conj(nat,nat)}{c}]
@@ -121,14 +122,14 @@
 \tadAxioma{posicionEstudiantes(iniciar(r,ca))}{$\emptyset$}
 \tadAxioma{posicionEstudiantes(ingresarEstudiante(a,p))}{\IF rodeadoDeHippies(p) THEN posicionEstudiantes(a) ELSE Ag(p,posicionEstudiantes(a)) FI}
 \tadAxioma{posicionEstudiantes(ingresarHippie(a,p))}{\IF rodeadoDeEstudiantes(p) THEN Ag(p,posicionEstudiantes(a)) ELSE posicionEstudiantes(a) FI}
-\tadAxioma{posicionEstudiantes(moverEstudiante(a,pi,pf))}{\IF rodeadoDeHippies(pf) $\lor$ puedeSalir(a,pi,pf) THEN posicionEstudiantes(a) ELSE Ag(pf,posicionEstudiantes(a) - {pi})FI }
+\tadAxioma{posicionEstudiantes(moverEstudiante(a,pi,pf))}{\IF rodeadoDeHippies(pf) $\lor$ puedeSalir(a,pi,pf) THEN posicionEstudiantes(a) ELSE Ag(pf,posicionEstudiantes(a) - {pi}) $\cup$ losHippiesRodeados(moverEstudiante(a,pi,pf),posicionesAdyacentes(pf) $\cap$ posicionHippies(a)) FI }
 \tadAxioma{posicionEstudiantes(moverHippie(a,pi))}{posicionEstudiantes(a) $-$ ( \IF bloqueo?(a,acechar(a,pi,posicionEstudiantes(a)),\\posicionesAdyacentes(a,acechar(a,pi,posicionEstudiantes(a)) $\cap$ posicionEstudiantes(a))THEN posicionEstudiantes(a) $-$ estudiantesAHippies(moverHippie(a,pi)\\,posicionesAdyacentes(a,acechar(a,pi,posicionEstudiantes(a))$\cap$ posicionEstudiantes(a)) ELSE $\emptyset$ FI )}
 \tadAxioma{posicionEstudiantes(moverAS(a,id))}{posicionEstudiantes(a)}
 
 \tadAxioma{posicionHippies(iniciar(r,ca))}{$\emptyset$}
 \tadAxioma{posicionHippies(ingresarEstudiante(a,p))}{\IF rodeadoDeHippies(a,p) THEN Ag(p,posicionHippies(a)) ELSE posicionHippies(a) FI}
 \tadAxioma{posicionHippies(ingresarHippie(a,p))}{\IF rodeadoDeEstudiantes(a,p) $\lor$ rodeadoDeAS(a,p) THEN posicionHippies(a) ELSE Ag(p,posicionHippies(a)) FI}
-\tadAxioma{posicionHippies(moverEstudiante(a,pi,pf))}{\IF rodeadoDeHippies(a,pf) THEN Ag(pf,posicionHippies(a)) ELSE posicionHippies(a) FI}
+\tadAxioma{posicionHippies(moverEstudiante(a,pi,pf))}{\IF rodeadoDeHippies(a,pf) THEN Ag(pf,posicionHippies(a)) ELSE posicionHippies(a) - losHippiesRodeados(moverEstudiante(a,pi,pf),posicinesAdyacentes(pf) $\cap$ posicionHippies(a)) FI}
 \tadAxioma{posicionHippies(moverHippie(a,pi))}{Ag(acechar(a,pi,posicionEstudiantes(a)),(posicionHippies(a) - {pi}))}
 \tadAxioma{posicionHippies(moverAS(a,id))}{posicionesDeHippies(a) - hippiesAEliminar(acechar(a,posicionDeAgente(a,id),\\posicionHippies(a)),posicionesAdyacentes(acechar(a,posicionDeAgente(a,id),\\posicionHippies(a)))) $\cap$ posicionesDeHippies(a))}
 
@@ -158,6 +159,8 @@
 \tadAxioma{estudiantesAHippies(a,cjE)}{\IF $\emptyset$?(cjE) THEN $\emptyset$ ELSE {\IF rodeadoDeHippies(dameUno(cjE)) THEN Ag(dameUno(cjE),estudiantesAHippies(a,sinUno(cjE))) ELSE estudiantesAHippies(a,sinUno(cjE)) FI} FI}
 
 \tadAxioma{hippiesAEliminar(a,p,cp)}{\IF $\emptyset$?(movimientosPosibles(a,dameUno(cp))- Ag(p,$\emptyset$) THEN Ag(dameUno(cp),hippiesAEliminar(a,p,sinUno(cp))) ELSE hippiesAEliminar(a,p,sinUno(cp)) FI}
+
+\tadAxioma{losHippiesRodeados(a,cjh)}{\IF $\emptyset$?($cjh$) THEN $\emptyset$ ELSE {\IF rodeadoDeEstudiantes(a,dameUno(cjh) THEN Ag(dameUno(cjh),losHippiesRodeados(a,sinUno(cjh))) ELSE losHippiesRodeados(a,sinUno(cjh)) FI} FI}
 
 \tadAxioma{masCercano(a,p,cp)}{menorDistancia(rastrillaje(a),menorDistancia(rastrillaje(a),p,cp),movimientosPosibles(a,p)))}
 

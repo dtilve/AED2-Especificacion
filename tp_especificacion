@@ -114,8 +114,42 @@
 \tadAxioma{obtenerAgentes(moverHippie(a,pi))}{obtenerAgentes(a)}
 \tadAxioma{obtenerAgentes(moverAS(a,id))}{\IF bloqueo?(moverAS(a,id), posicionesAdyacentes(acechar(posicionDeAgente(a,id), posicionHippies(a)) $\cap$ posicionHippies(a)) THEN {\IF bloqueo?(moverAS(a,id), posicionesAdyacentes(acechar(posicionDeAgente(a,id),posicionEstudiantes(a) $\cap$ posicionesEstudiantes(a)) THEN reDefinirDiccAg(a,participantes(a,acechar(a, posicionDeAgente(a,id),posicionHippies(a) ))),1,1, obtenerAgentes(a)) ELSE reDefinirDiccAg(a,participantes(moverAS(a,id),acechar(a, posicionDeAgente(a,id),posicionHippies(a) ))),1,0, obtenerAgentes(a)) FI} ELSE {\IF bloqueo?(moverAS(a,id),posicionesAdyacentes(acechar\\((posicionDeAgente(a,id),posicionHippies(a)))) $\cap$ posicionEstudiantes(a)) THEN reDefinirDiccAg(a,participantes(a,acechar(a, posicionDeAgente(a,id),posicionHippies(a) ))),0,1,obtenerAgentes(a)) ELSE def(id,(acechar(a,posicionDeAgente(a,id),posicionHippies(a)) , capturas(a,id) , sanciones(a,id) ),obtenerAgentes(a)) FI} FI}
 
+\tadAxioma{posicionEstudiantes(iniciar(r,ca))}{{}}
+\tadAxioma{posicionEstudiantes(ingresarEstudiante(a,p))}{\IF rodeadoDeHippies(p) THEN posicionEstudiantes(a) ELSE Ag(p,posicionEstudiantes(a)) FI}
+\tadAxioma{posicionEstudiantes(ingresarHippie(a,p))}{\IF rodeadoDeEstudiantes(p) THEN Ag(p,posicionEstudiantes(a)) ELSE posicionEstudiantes(a) FI}
+\tadAxioma{posicionEstudiantes(moverEstudiante(a,pi,pf))}{\IF rodeadoDeHippies(pf) $\lor$ puedeSalir(a,pi,pf) THEN posicionEstudiantes(a) ELSE Ag(pf,posicionEstudiantes(a) - {pi})FI }
+\tadAxioma{posicionEstudiantes(moverHippie(a,pi))}{posicionEstudiantes(a) - ( \IF bloqueo?(a,acechar(a,pi,posicionEstudiantes(a)),posicionesAdyacentes(a,acechar(a,pi,posicionEstudiantes(a)) $\cap$ posicionEstudiantes(a))THEN ELSE {} FI )}
+\tadAxioma{posicionEstudiantes(moverAS(a,id))}{posicionEstudiantes(a)}
+
+\tadAxioma{posicionHippies(iniciar(r,ca))}{{}}
+\tadAxioma{posicionHippies(ingresarEstudiante(a,p))}{\IF rodeadoDeHippies(a,p) THEN Ag(p,posicionHippies(a)) ELSE posicionHippies(a) FI}
+\tadAxioma{posicionHippies(ingresarHippie(a,p))}{\IF rodeadoDeEstudiantes(a,p) $\lor$ rodeadoDeAS(a,p) THEN posicionHippies(a) ELSE Ag(p,posicionHippies(a)) FI}
+\tadAxioma{posicionHippies(moverEstudiante(a,pi,pf))}{\IF rodeadoDeHippies(a,pf) THEN Ag(pf,posicionHippies(a)) ELSE posicionHippies(a) FI}
+\tadAxioma{posicionHippies(moverHippie(a,pi))}{Ag(acechar(a,pi,posicionEstudiantes(a)),(posicionHippies(a) - {pi}))}
+\tadAxioma{posicionHippies(moverAS(a,id))}{posicionesDeHippies(a) - hippiesAEliminar(a,sechar(a,posicionDeAgente(a,id),posicionHippies(a)),posicionesAdyacentes(acechar(a,posicionDeAgente(a,id),posicionHippies(a)))) $\cap$ posicionesDeHippies(a))}
+
+\tadAxioma{rastrillaje(iniciar(r,ca))}{r}
+\tadAxioma{rastrillaje(ingresarEstudiante(a,p))}{rastrillaje(a)}
+\tadAxioma{rastrillaje(ingresarHippie(a,p))}{rastrillaje(a)}
+\tadAxioma{rastrillaje(moverEstudiante(a,pi,pf))}{rastrillaje(a)}
+\tadAxioma{rastrillaje(moverHippie(a,pi))}{rastrillaje(a)}
+\tadAxioma{rastrillaje(moverAS(a,pi))}{rastrillaje(a)}
+
+\tadAxioma{#estudiantes(a)}{#posicionEstudiantes(a)}
+
+\tadAxioma{#hippies(a)}{#posicionHippies(a)}
+
+\tadAxioma{acechar(a,p,cp)}{\IF \emptyset$?($cp$) THEN masCercano(a,p,salidas(rastrillaje(a))-disponibles(a)) ELSE masCercano(a,p,cp) FI}
+
+\tadAxioma{bloqueo?(a,p,cp)}{\IF \emptyset$?($cp$) THEN false ELSE \emptyset$?($movimientosPosibles(a, dameUno(cp)$) $\lor$ bloqueo?(a,p,sinUno(cp))FI}
+
+\tadAxioma{capturasDeAgente(a,id)}{$\Pi_2$(obtener(n,obtenerAgentes(a)))}
+
+\tadAxioma{conjCapturas(a,n)}{\IF $\neg$(def?(n)) THEN {} ELSE (n,capturasDeAgente(a,n)) $\cup$ conjCapturas(a,n+1) FI}
+
 
 \tadAxioma{}{}
+\IF THEN ELSE FI
 
 \end{tad}
 

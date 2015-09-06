@@ -46,10 +46,13 @@
 \addtolength{\headheight}{1pt}
 \lhead{Algoritmos y Estructuras de Datos II}
 \rhead{$2^{\mathrm{do}}$ cuatrimestre de 2015}
-\cfoot{\thepage /\pageref{LastPage}}
+
 \renewcommand{\footrulewidth}{0.4pt}
 
 \begin{document}
+
+\noindent{\textbf{TAD} D\_AGENTES es diccionario(nat,tupla(pos,nat,nat))}\\
+\noindent{\textbf{TAD} POS es tupla (nat,nat)}\\
 
 \begin{tad}{\tadNombre{Alta Seguridad}}
 
@@ -87,6 +90,7 @@
 \tadOperacion{conjCapturas}{altaSeguridad/a,nat/id}{conj(nat,at)}{}
 \tadOperacion{conjPosAgentes}{d\_agentes/d}{conj(pos)}{}
 \tadOperacion{disponibles}{altaSeguridad/a}{conj(pos)}{}
+\tadOperacion{estudiantesAHippies}{altaSeguridad/a,conj(pos)/cjE}{conj(pos)}{}
 \tadOperacion{hippiesAEliminar}{altaSeguridad/a,pos/p,conj(pos)/cp}{conj(pos)}{}
 \tadOperacion{masCercano}{altaSeguridad/a,pos/p,conj(pos)/cp}{pos}{}
 \tadOperacion{masVigilante}{altaSeguridad/a}{nat}{}
@@ -114,19 +118,19 @@
 \tadAxioma{obtenerAgentes(moverHippie(a,pi))}{obtenerAgentes(a)}
 \tadAxioma{obtenerAgentes(moverAS(a,id))}{\IF bloqueo?(moverAS(a,id), posicionesAdyacentes(acechar(posicionDeAgente(a,id), posicionHippies(a)) $\cap$ posicionHippies(a)) THEN {\IF bloqueo?(moverAS(a,id), posicionesAdyacentes(acechar(posicionDeAgente(a,id),posicionEstudiantes(a) $\cap$ posicionesEstudiantes(a)) THEN reDefinirDiccAg(a,participantes(a,acechar(a, posicionDeAgente(a,id),posicionHippies(a) ))),1,1, obtenerAgentes(a)) ELSE reDefinirDiccAg(a,participantes(moverAS(a,id),acechar(a, posicionDeAgente(a,id),posicionHippies(a) ))),1,0, obtenerAgentes(a)) FI} ELSE {\IF bloqueo?(moverAS(a,id),posicionesAdyacentes(acechar\\((posicionDeAgente(a,id),posicionHippies(a)))) $\cap$ posicionEstudiantes(a)) THEN reDefinirDiccAg(a,participantes(a,acechar(a, posicionDeAgente(a,id),posicionHippies(a) ))),0,1,obtenerAgentes(a)) ELSE def(id,(acechar(a,posicionDeAgente(a,id),posicionHippies(a)) , capturas(a,id) , sanciones(a,id) ),obtenerAgentes(a)) FI} FI}
 
-\tadAxioma{posicionEstudiantes(iniciar(r,ca))}{{}}
+\tadAxioma{posicionEstudiantes(iniciar(r,ca))}{$\emptyset$}
 \tadAxioma{posicionEstudiantes(ingresarEstudiante(a,p))}{\IF rodeadoDeHippies(p) THEN posicionEstudiantes(a) ELSE Ag(p,posicionEstudiantes(a)) FI}
 \tadAxioma{posicionEstudiantes(ingresarHippie(a,p))}{\IF rodeadoDeEstudiantes(p) THEN Ag(p,posicionEstudiantes(a)) ELSE posicionEstudiantes(a) FI}
 \tadAxioma{posicionEstudiantes(moverEstudiante(a,pi,pf))}{\IF rodeadoDeHippies(pf) $\lor$ puedeSalir(a,pi,pf) THEN posicionEstudiantes(a) ELSE Ag(pf,posicionEstudiantes(a) - {pi})FI }
-\tadAxioma{posicionEstudiantes(moverHippie(a,pi))}{posicionEstudiantes(a) - ( \IF bloqueo?(a,acechar(a,pi,posicionEstudiantes(a)),posicionesAdyacentes(a,acechar(a,pi,posicionEstudiantes(a)) $\cap$ posicionEstudiantes(a))THEN ELSE {} FI )}
+\tadAxioma{posicionEstudiantes(moverHippie(a,pi))}{posicionEstudiantes(a) $-$ ( \IF bloqueo?(a,acechar(a,pi,posicionEstudiantes(a)),\\posicionesAdyacentes(a,acechar(a,pi,posicionEstudiantes(a)) $\cap$ posicionEstudiantes(a))THEN posicionEstudiantes(a) $-$ estudiantesAHippies(moverHippie(a,pi)\\,posicionesAdyacentes(a,acechar(a,pi,posicionEstudiantes(a))$\cap$ posicionEstudiantes(a)) ELSE $\emptyset$ FI )}
 \tadAxioma{posicionEstudiantes(moverAS(a,id))}{posicionEstudiantes(a)}
 
-\tadAxioma{posicionHippies(iniciar(r,ca))}{{}}
+\tadAxioma{posicionHippies(iniciar(r,ca))}{$\emptyset$}
 \tadAxioma{posicionHippies(ingresarEstudiante(a,p))}{\IF rodeadoDeHippies(a,p) THEN Ag(p,posicionHippies(a)) ELSE posicionHippies(a) FI}
 \tadAxioma{posicionHippies(ingresarHippie(a,p))}{\IF rodeadoDeEstudiantes(a,p) $\lor$ rodeadoDeAS(a,p) THEN posicionHippies(a) ELSE Ag(p,posicionHippies(a)) FI}
 \tadAxioma{posicionHippies(moverEstudiante(a,pi,pf))}{\IF rodeadoDeHippies(a,pf) THEN Ag(pf,posicionHippies(a)) ELSE posicionHippies(a) FI}
 \tadAxioma{posicionHippies(moverHippie(a,pi))}{Ag(acechar(a,pi,posicionEstudiantes(a)),(posicionHippies(a) - {pi}))}
-\tadAxioma{posicionHippies(moverAS(a,id))}{posicionesDeHippies(a) - hippiesAEliminar(a,sechar(a,posicionDeAgente(a,id),posicionHippies(a)),posicionesAdyacentes(acechar(a,posicionDeAgente(a,id),posicionHippies(a)))) $\cap$ posicionesDeHippies(a))}
+\tadAxioma{posicionHippies(moverAS(a,id))}{posicionesDeHippies(a) - hippiesAEliminar(acechar(a,posicionDeAgente(a,id),\\posicionHippies(a)),posicionesAdyacentes(acechar(a,posicionDeAgente(a,id),\\posicionHippies(a)))) $\cap$ posicionesDeHippies(a))}
 
 \tadAxioma{rastrillaje(iniciar(r,ca))}{r}
 \tadAxioma{rastrillaje(ingresarEstudiante(a,p))}{rastrillaje(a)}
@@ -135,23 +139,25 @@
 \tadAxioma{rastrillaje(moverHippie(a,pi))}{rastrillaje(a)}
 \tadAxioma{rastrillaje(moverAS(a,pi))}{rastrillaje(a)}
 
-\tadAxioma{#estudiantes(a)}{#posicionEstudiantes(a)}
+\tadAxioma{\#estudiantes(a)}{\#posicionEstudiantes(a)}
 
-\tadAxioma{#hippies(a)}{#posicionHippies(a)}
+\tadAxioma{\#hippies(a)}{\#posicionHippies(a)}
 
-\tadAxioma{acechar(a,p,cp)}{\IF \emptyset$?($cp$) THEN masCercano(a,p,salidas(rastrillaje(a))-disponibles(a)) ELSE masCercano(a,p,cp) FI}
+\tadAxioma{acechar(a,p,cp)}{\IF $\emptyset$?($cp$) THEN masCercano(a,p,salidas(rastrillaje(a))-disponibles(a)) ELSE masCercano(a,p,cp) FI}
 
-\tadAxioma{bloqueo?(a,p,cp)}{\IF \emptyset$?($cp$) THEN false ELSE \emptyset$?($movimientosPosibles(a, dameUno(cp)$) $\lor$ bloqueo?(a,p,sinUno(cp))FI}
+\tadAxioma{bloqueo?(a,p,cp)}{\IF $\emptyset$?(cp) THEN false ELSE $\emptyset$?(movimientosPosibles(a, dameUno(cp)) $\lor$ bloqueo?(a,p,sinUno(cp))FI}
 
 \tadAxioma{capturasDeAgente(a,id)}{$\Pi_2$(obtener(n,obtenerAgentes(a)))}
 
 \tadAxioma{conjCapturas(a,n)}{\IF $\neg$(def?(n)) THEN {} ELSE {(n,capturasDeAgente(a,n))} $\cup$ conjCapturas(a,n+1) FI}
 
-\tadAxioma{conjPosAgentes(d)}{\IF \emptyset$?($d$) THEN {} ELSE {$\Pi_1$(dameUno(d))} $\cup$ conjPosAgentes(sinUno(d)) FI}
+\tadAxioma{conjPosAgentes(d)}{\IF $\emptyset$?(d) THEN {} ELSE {$\Pi_1$(dameUno(d))} $\cup$ conjPosAgentes(sinUno(d)) FI}
 
 \tadAxioma{disponibles(a)}{libres(rastrillaje(a)) - posicionEstudiantes(a) - posicionHippies(a) - posicionAgentes(a)}
 
-\tadAxioma{hippiesAEliminar(a,p,cp)}{\IF \emptyset$?($movimientosPosibles(a,dameUno(cp)$)- {p} THEN Ag(dameUno(cp),hippiesAEliminar(a,p,sinUno(cp))) ELSE hippiesAEliminar(a,p,sinUno(cp)) FI}
+\tadAxioma{estudiantesAHippies(a,cjE)}{\IF $\emptyset$?(cjE) THEN $\emptyset$ ELSE {\IF rodeadoDeHippies(dameUno(cjE)) THEN Ag(dameUno(cjE),estudiantesAHippies(a,sinUno(cjE))) ELSE estudiantesAHippies(a,sinUno(cjE)) FI} FI}
+
+\tadAxioma{hippiesAEliminar(a,p,cp)}{\IF $\emptyset$?(movimientosPosibles(a,dameUno(cp))- Ag(p,$\emptyset$) THEN Ag(dameUno(cp),hippiesAEliminar(a,p,sinUno(cp))) ELSE hippiesAEliminar(a,p,sinUno(cp)) FI}
 
 \tadAxioma{masCercano(a,p,cp)}{menorDistancia(rastrillaje(a),menorDistancia(rastrillaje(a),p,cp),movimientosPosibles(a,p)))}
 
@@ -161,42 +167,42 @@
 
 \tadAxioma{posicionAgentes(a)}{posicionAgentes'(obtenerAgentes(a))}
 
-\tadAxioma{posicionAgentes'(d)}{\IF \emptyset$?($claves(d)$) THEN {} ELSE Ag(pi_1(obtener(dameUno(claves(d)))),posicionAgentes'(borrar(dameUno(claves(d))),d)) FI}
+\tadAxioma{posicionAgentes'(d)}{\IF $\emptyset$?(claves(d)) THEN {} ELSE Ag($\Pi_1$(obtener(dameUno(claves(d)))),posicionAgentes'(borrar(dameUno(claves(d))),d)) FI}
 
 \tadAxioma{posicionDeAgente(a,id)}{$\Pi_1$(obtener(n,obtenerAgentes(a)))}
 
 \tadAxioma{posicionesAdyacentes(p)}{($\Pi_1$(p)+1,$\Pi_2$(p)), ($\Pi_1$(p)-1,$\Pi_2$(p)), ($\Pi_1$(p),$\Pi_2$(p)+1), ($\Pi_1$(p),$\Pi_2$(p)-1)}
 
-\tadAxioma{posIngreso(a,p}{$\Pi_2$(p) == 1 $\lor$ $\Pi_2$(p) == alto(rastrillaje(a)}
+\tadAxioma{posIngreso(a,p}{$\Pi_2$(p) == 1 $\lor$ $\Pi_2$(p) == alto(rastrillaje(a))}
 
 \tadAxioma{puedeSalir(a,pi,pf)}{posIngreso(a,pi) $\land$ ($\Pi_2$(pf)==0 $\lor$ $\Pi_2$(pf)==alto(rastrillaje(a))+1)}
 
-\tadAxioma{reDefinirDiccAg(a,cid,cap,san,d}{\IF \emptyset$?($cid$) THEN obtenerAgentes(a) ELSE redefinirDiccAg(a, sinUno(cid), cap, san, definir(dameUno(cid),(posicionDeAgente(a,dameUno(cid)),capturasDeAgente(a,dameUno(cid))+cap,sancionesDeAgente(a,dameUno(cid))+san), obtenerAgentes(a))) FI}
+\tadAxioma{reDefinirDiccAg(a,cid,cap,san,d)}{\IF $\emptyset$?(cid) THEN obtenerAgentes(a) ELSE redefinirDiccAg(a, sinUno(cid), cap, san, definir(dameUno(cid),(posicionDeAgente(a,dameUno(cid)),capturasDeAgente(a,\\dameUno(cid))+cap,sancionesDeAgente(a,dameUno(cid))+san), obtenerAgentes(a))) FI}
 
-\tadAxioma{rodeadoDeAS (a,p)}{(#(posicionesAdyacentes(a,p) $\cap$ posicionAgentes(a)) >= 1) $\land$ \emptyset$?($movimientosPosibles(a,p)$)}
+\tadAxioma{rodeadoDeAS (a,p)}{(\#(posicionesAdyacentes(a,p) $\cap$ posicionAgentes(a)) >= 1) $\land$ $\emptyset$?(movimientosPosibles(a,p))}
 
-\tadAxioma{rodeadoDeEstudiantes(a,p)}{ ((posicionesAdyacentes(a,p) $\cap$ generarPosiciones(a)) $\subseteq$ posicionEstudiantes(a)) $\land$ \emptyset$?($movimientosPosibles(a,p)$)}
+\tadAxioma{rodeadoDeEstudiantes(a,p)}{ ((posicionesAdyacentes(a,p) $\cap$ generarPosiciones(a)) $\subseteq$ posicionEstudiantes(a)) $\land$ $\emptyset$?(movimientosPosibles(a,p))}
 
-\tadAxioma{rodeadoDeHippies(a,p)}{#(posicionesAdyacentes(a,p) $\cap$ posicionHippies(a)) >= 2}
+\tadAxioma{rodeadoDeHippies(a,p)}{\#(posicionesAdyacentes(a,p) $\cap$ posicionHippies(a)) >= 2}
 
-\tadAxioma{sancionesDeAgente(a,id)}{$\Pi_3$(obtener(n,obtenerAgentes(a)))}
+\tadAxioma{sancionesDeAgente(a,id)}{$\Pi_3$(obtener(id,obtenerAgentes(a)))}
 
-\tadAxioma{tieneMasCapturas(c)}{\IF (#c==2)THEN 
-                                  \IF $\Pi_2$(dameUno(c)) >= $\Pi_2$(dameUno(sinUno(c)))THEN 
-                                    \IF $\Pi_2$(dameUno(c)) == $\Pi_2$(dameUno(sinUno(c)))THEN 
-                                      \IF $\Pi_1$(dameUno(c)) < $\Pi_1$(dameUno(sinUno(c))) THEN 
+\tadAxioma{tieneMasCapturas(c)}{\IF (\#c==2)THEN 
+                                  {\IF $\Pi_2$(dameUno(c)) >= $\Pi_2$(dameUno(sinUno(c)))THEN 
+                                    {\IF $\Pi_2$(dameUno(c)) == $\Pi_2$(dameUno(sinUno(c)))THEN 
+                                      {\IF $\Pi_1$(dameUno(c)) < $\Pi_1$(dameUno(sinUno(c))) THEN 
                                         dameUno(c)
-                                      ELSE dameUno(sinUno(c)) FI
-                                    ELSE dameUno(c) FI 
-                                  ELSE dameUno(sinUno(c)) FI 
+                                      ELSE dameUno(sinUno(c)) FI}
+                                    ELSE dameUno(c) FI} 
+                                  ELSE dameUno(sinUno(c)) FI} 
                                 ELSE 
-                                  \IF $\Pi_2$(dameUno(c)) >= $\Pi_2$(dameUno(sinUno(c)))THEN 
-                                    \IF $\Pi_2$(dameUno(c)) == $\Pi_2$(dameUno(sinUno(c)))THEN 
-                                      \IF $\Pi_1$(dameUno(c)) < $\Pi_1$(dameUno(sinUno(c))) THEN 
+                                  {\IF $\Pi_2$(dameUno(c)) >= $\Pi_2$(dameUno(sinUno(c)))THEN 
+                                    {\IF $\Pi_2$(dameUno(c)) == $\Pi_2$(dameUno(sinUno(c)))THEN 
+                                      {\IF $\Pi_1$(dameUno(c)) < $\Pi_1$(dameUno(sinUno(c))) THEN 
                                         tieneMasSanciones(dameUno(c) $\cup$ sinUno(sonUno(c)))
-                                      ELSE tieneMasSanciones(dameUno(sinUno(c)) $\cup$ sinUno(sinUno(c))) FI
-                                    ELSE tieneMasSanciones(dameUno(c) $\cup$ sinUno(sonUno(c))) FI 
-                                  ELSE tieneMasSanciones(dameUno(sinUno(c)) $\cup$ sinUno(sinUno(c))) FI 
+                                      ELSE tieneMasSanciones(dameUno(sinUno(c)) $\cup$ sinUno(sinUno(c))) FI}
+                                    ELSE tieneMasSanciones(dameUno(c) $\cup$ sinUno(sonUno(c))) FI} 
+                                  ELSE tieneMasSanciones(dameUno(sinUno(c)) $\cup$ sinUno(sinUno(c))) FI} 
                                 FI}
 
 \end{tad}
@@ -205,7 +211,7 @@
 
 \begin{tad}{\tadNombre{Rastrillaje}}
 
-\tadIgualdadObservacional{r}{r'}{rastrillaje}{ ($ r  \igobs r') \Leftrightarrow (ostaculos(r) \igobs ostaculos(r')) \land (alto(r) \igobs alto(r')) \land (ancho(r) \igobs ancho(r')) $}
+\tadIgualdadObservacional{r}{r'}{rastrillaje}{$ ( r  \igobs r') \Leftrightarrow (ostaculos(r) \igobs ostaculos(r')) \land (alto(r) \igobs alto(r')) \land (ancho(r) \igobs ancho(r')) $}
 
 \tadGeneros{rastrillaje}
 
@@ -221,16 +227,16 @@
 
 \tadGeneradores
 
-\tadOperacion{rastrillar}{nat ancho, nat altura, conj(pos) conjObs}{rastrillaje}{ (ancho>0) $\land$ (alto>0) $\land$ ( (/forall x:pos) x \in conjObs \Rightarrow (1 $\leq$ $\Pi_1$(x)) $\land$ ($\Pi_1$(x) $\leq$ ancho) $\land$ (1 $\leq$ $\Pi_2$(x)) $\land$ ($\Pi_2$(x) $\leq$ alto) )}
+\tadOperacion{rastrillar}{nat/ancho, nat/altura, conj(pos)/conjObs}{rastrillaje}{ (ancho>0) $\land$ (alto>0) $\land$ ( (\paratodo{pos}{x}) x $\in$ conjObs $\implies$ (1 $\leq$ $\Pi_1$(x)) $\land$ ($\Pi_1$(x) $\leq$ ancho) $\land$ (1 $\leq$ $\Pi_2$(x)) $\land$ ($\Pi_2$(x) $\leq$ alto) )}
 
 \tadOtrasOperaciones
 
-\tadOperacion{distancia}{nat a, nat b}{nat c}{}
-\tadOperacion{distanciaRectilinea}{rastrillaje r, pos p1, pos p2}{nat n}{}
-\tadOperacion{generarPosiciones}{rastrillaje r, nat i, nat j}{conj(pos)}{(0 $\leq$ i) $\land$ (i $\leq$ ancho(r)) $\land$ (0 $\leq$ j) $\land$ (j $\leq$ alto(r))}
+\tadOperacion{distancia}{nat/a, nat/b}{nat c}{}
+\tadOperacion{distanciaRectilinea}{rastrillaje/r, pos/p1, pos/p2}{nat n}{}
+\tadOperacion{generarPosiciones}{rastrillaje/r, nat/i, nat/j}{conj(pos)}{(0 $\leq$ i) $\land$ (i $\leq$ ancho(r)) $\land$ (0 $\leq$ j) $\land$ (j $\leq$ alto(r))}
 \tadOperacion{libres}{rastrillaje}{conj(pos)}{}
-\tadOperacion{menorDistancia}{rastrillaje r, pos p, conj(pos) conQ}{pos q}{( p \in generarPosiciones(r,ancho(r),alto(r)) ) $\land$ ((\forall q: pos) (q \in conQ \Rightarrow q \in generarPosiciones(r,ancho(r),alto(r))))}
-\tadOperacion{salidas}{rastrillaje r, nat i}{conj(pos)}{(1 $\leq$ i) $\land$ (i $\leq$ ancho(r))}
+\tadOperacion{menorDistancia}{rastrillaje/r, pos/p, conj(pos)/conQ}{pos q}{( p $\in$ generarPosiciones(r,ancho(r),alto(r)) ) $\land$ ((\paratodo{pos}{q}) (q $\in$ conQ $\implies$ q $\in$ generarPosiciones(r,ancho(r),alto(r))))}
+\tadOperacion{salidas}{rastrillaje/r, nat/i}{conj(pos)}{(1 $\leq$ i) $\land$ (i $\leq$ ancho(r))}
 
 \tadAxiomas[\paratodo{rastrillaje}{r}, \paratodo{nat}{i,j,a,h}, \paratodo{pos}{p,q}, \paratodo{conj(pos)}{co}]
 
@@ -239,9 +245,9 @@
 \tadAxioma{obstaculos(rastrillar(a,h,co))}{co}
 \tadAxioma{distancia(i,j)}{\IF i $\geq$ j THEN i-j ELSE j-i FI}
 \tadAxioma{distanciaRectilinea(r,p,q)}{distancia(distancia($\Pi_1$(p),$\Pi_1$(q)),distancia($\Pi_1$(p),$\Pi_1$(q)))}
-\tadAxioma{generarPosiciones(r, i, j)}{\IF i>0 THEN \IF j>0 THEN Ag((i,j),generarPosiciones(r,i, j-1)) ELSE Ag((i,j),generarPosiciones(r,i-1,j)) FI ELSE {} FI}
+\tadAxioma{generarPosiciones(r, i, j)}{\IF i>0 THEN {\IF j>0 THEN Ag((i,j),generarPosiciones(r,i, j-1)) ELSE Ag((i,j),generarPosiciones(r,i-1,j)) FI} ELSE $\emptyset$ FI}
 \tadAxioma{libres(r)}{generarPosiciones(r,ancho(r),alto(r)) - obstaculos(r)} 
-\tadAxioma{menorDistancia(r,p,conQ))}{\IF \emptyset$?(conQ) THEN p ELSE \IF #conQ > 1 THEN menor(distanciaRectilinea(r,p,dameUno(conQ)),menorDistancia(r,p,sinUno(conQ))) ELSE dameUno(conQ) FI FI}
+\tadAxioma{menorDistancia(r,p,conQ))}{\IF $\emptyset$?(conQ) THEN p ELSE {\IF \#conQ > 1 THEN menor(distanciaRectilinea(r,p,dameUno(conQ)),menorDistancia(r,p,sinUno(conQ))) ELSE dameUno(conQ) FI} FI}
 \tadAxioma{salidas(r,i)}{\IF i == 1 THEN Ag((1,1),Ag((1,alto(r)),vacio)) ELSE Ag((i,1),Ag((i,alto(r)),salidas(r,i-1)))FI}
 
 \end{tad}

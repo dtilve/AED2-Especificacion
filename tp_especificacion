@@ -13,4 +13,4 @@
 
 		\tadAxioma{posicionHippies(moverEstudiante(a,pi,pf))}{\IF rodeadoDeHippies(a,pf) THEN Ag(pf,posicionHippies(a)) ELSE posicionHippies(a) - losHippiesRodeados(moverEstudiante(a,pi,pf),posicinesAdyacentes(pf) $\cap$ posicionHippies(a)) FI}
 
-		\tadAxioma{losHippiesRodeados(a,cjh)}{\IF \emptyset$?($cjh$) THEN {} ELSE \IF rodeadoDeEstudiantes(a,dameUno(cjh) THEN Ag(dameUno(cjh),losHippiesRodeados(a,sinUno(cjh))) ELSE losHippiesRodeados(a,sinUno(cjh)) FI FI
+		\tadAxioma{losHippiesRodeados(a,cjh)}{\IF \emptyset$?($cjh$) THEN {} ELSE \IF rodeadoDeEstudiantes(a,dameUno(cjh) THEN Ag(dameUno(cjh),losHippiesRodeados(a,sinUno(cjh))) ELSE losHippiesRodeados(a,sinUno(cjh)) FI FI}

@@ -51,7 +51,7 @@
 
 \begin{document}
 
-\noindent{\textbf{TAD} D\_AGENTES es diccionario(nat,tupla(pos,nat,nat))}\\
+\noindent{\textbf{TAD} D\_AGENTES es diccionario(nat,(pos,nat,nat))}\\
 \noindent{\textbf{TAD} POS es tupla (nat,nat)}\\
 
 \begin{tad}{\tadNombre{Alta Seguridad}}
@@ -66,10 +66,10 @@
 
 \tadObservadores
 
-\tadOperacion{obtenerAgentes}{altaSeguridad a}{d\_agentes}{}
-\tadOperacion{posicionEstudiantes}{altaSeguridad a}{conj(pos)}{}
-\tadOperacion{posicionHippies}{altaSeguridad a}{conj(pos)}{}
-\tadOperacion{rastrillaje}{altaSeguridad a}{rastrillaje}{}
+\tadOperacion{obtenerAgentes}{altaSeguridad/a}{d\_agentes}{}
+\tadOperacion{posicionEstudiantes}{altaSeguridad/a}{conj(pos)}{}
+\tadOperacion{posicionHippies}{altaSeguridad/a}{conj(pos)}{}
+\tadOperacion{rastrillaje}{altaSeguridad/a}{rastrillaje}{}
 
 \tadGeneradores
 
